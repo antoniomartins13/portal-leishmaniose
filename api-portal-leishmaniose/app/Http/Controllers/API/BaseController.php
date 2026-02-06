@@ -16,6 +16,30 @@ use Illuminate\Http\JsonResponse;
 class BaseController extends Controller
 {
 
+    /**
+     * Valida permissão e aborta com 403 se não tiver
+     */
+    protected function authorize(string $permission): void
+    {
+        PermissionHelper::authorize($permission);
+    }
+
+    /**
+     * Verifica se usuário tem permissão (retorna bool)
+     */
+    protected function can(string $permission): bool
+    {
+        return PermissionHelper::can($permission);
+    }
+
+    /**
+     * Verifica se usuário tem cargo
+     */
+    protected function hasRole($roles): bool
+    {
+        return PermissionHelper::hasRole($roles);
+    }
+
     public function sendResponse($result, string $message, int $code = 200): JsonResponse
     {
         if (request()->user()) {
