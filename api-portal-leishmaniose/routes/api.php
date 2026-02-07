@@ -51,6 +51,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Notification management routes (gestor/admin)
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('notifications/export-csv', [NotificationController::class, 'exportCsv'])->name('notifications.exportCsv');
+    Route::get('notifications/export-pdf', [NotificationController::class, 'exportPdf'])->name('notifications.exportPdf');
     Route::get('notifications/{notification}', [NotificationController::class, 'show'])->name('notifications.show');
     Route::patch('notifications/{notification}/status', [NotificationController::class, 'updateStatus'])->name('notifications.updateStatus');
 

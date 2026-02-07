@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, User, ChevronDown, LogOut, Settings, FileText } from 'lucide-react';
+import { Menu, X, User, ChevronDown, LogOut, Settings, FileText, BarChart3 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { usePermission } from '../hooks/usePermission';
 
@@ -32,6 +32,7 @@ export function Header() {
 
     const canAccessAdmin = user && hasRole('admin');
     const canManageNotifications = user && hasRole(['admin', 'gestor']);
+    const canAccessResearch = user && hasRole(['admin', 'gestor', 'pesquisador']);
 
     return (
         <header className="bg-teal-700 text-white shadow-md">
@@ -90,6 +91,16 @@ export function Header() {
                                             >
                                                 <FileText size={16} />
                                                 <span>Notificações</span>
+                                            </Link>
+                                        )}
+                                        {canAccessResearch && (
+                                            <Link
+                                                to="/casos-confirmados"
+                                                className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition-colors"
+                                                onClick={() => setIsDropdownOpen(false)}
+                                            >
+                                                <BarChart3 size={16} />
+                                                <span>Casos Confirmados</span>
                                             </Link>
                                         )}
                                         {canAccessAdmin && (
@@ -189,6 +200,16 @@ export function Header() {
                                         >
                                             <FileText size={18} />
                                             <span>Notificações</span>
+                                        </Link>
+                                    )}
+                                    {canAccessResearch && (
+                                        <Link
+                                            to="/casos-confirmados"
+                                            className="flex items-center space-x-2 py-2 hover:text-teal-200 transition-colors"
+                                            onClick={() => setIsMenuOpen(false)}
+                                        >
+                                            <BarChart3 size={18} />
+                                            <span>Casos Confirmados</span>
                                         </Link>
                                     )}
                                     {canAccessAdmin && (

@@ -67,6 +67,18 @@ export interface NotificationFilters {
   createdTo?: string
 }
 
+export interface ConfirmedCasesFilters {
+  search?: string
+  state?: string
+  city?: string
+  neighborhood?: string
+  symptomsDateFrom?: string
+  symptomsDateTo?: string
+  createdFrom?: string
+  createdTo?: string
+  symptomId?: number
+}
+
 const baseApi = new BaseApi<Notification>('notifications')
 
 export const notificationsApi = {
@@ -115,5 +127,89 @@ export const notificationsApi = {
   async updateStatus(id: number, status: string): Promise<Notification> {
     const response = await api.patch(`/notifications/${id}/status`, { status })
     return response?.data?.data ?? null
+  },
+
+  /**
+   * Lista casos confirmados com filtros avançados (pesquisador/admin/gestor)
+   */
+  async getConfirmedCases(
+    page = 1,
+    filters?: ConfirmedCasesFilters
+  ): Promise<PaginatedNotifications> {
+    const params = new URLSearchParams()
+    params.append('page', String(page))
+    params.append('status', 'confirmed')
+    if (filters?.search) params.append('search', filters.search)
+    if (filters?.state) params.append('state', filters.state)
+    if (filters?.city) params.append('city', filters.city)
+    if (filters?.neighborhood) params.append('neighborhood', filters.neighborhood)
+    if (filters?.symptomsDateFrom) params.append('symptoms_date_from', filters.symptomsDateFrom)
+    if (filters?.symptomsDateTo) params.append('symptoms_date_to', filters.symptomsDateTo)
+    if (filters?.createdFrom) params.append('created_from', filters.createdFrom)
+    if (filters?.createdTo) params.append('created_to', filters.createdTo)
+    if (filters?.symptomId) params.append('symptom_id', String(filters.symptomId))
+
+    const response = await api.get(`/notifications?${params.toString()}`)
+    return response?.data ?? { data: [], current_page: 1, last_page: 1, per_page: 15, total: 0 }
+  },
+
+  /**
+   * Exporta casos confirmados como CSV
+   */
+  async exportCsv(filters?: ConfirmedCasesFilters): Promise<void> {
+    const params = new URLSearchParams()
+    if (filters?.search) params.append('search', filters.search)
+    if (filters?.state) params.append('state', filters.state)
+    if (filters?.city) params.append('city', filters.city)
+    if (filters?.neighborhood) params.append('neighborhood', filters.neighborhood)
+    if (filters?.symptomsDateFrom) params.append('symptoms_date_from', filters.symptomsDateFrom)
+    if (filters?.symptomsDateTo) params.append('symptoms_date_to', filters.symptomsDateTo)
+    if (filters?.createdFrom) params.append('created_from', filters.createdFrom)
+    if (filters?.createdTo) params.append('created_to', filters.createdTo)
+    if (filters?.symptomId) params.append('symptom_id', String(filters.symptomId))
+
+    const response = await api.get(`/notifications/export-csv?${params.toString()}`, {
+      responseType: 'blob',
+    })
+
+    const url = window.URL.createObjectURL(new Blob([response.data]))
+    const link = document.createElement('a')
+    link.href = url
+    const date = new Date().toISOString().split('T')[0]
+    link.setAttribute('download', `casos-confirmados-${date}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    window.URL.revokeObjectURL(url)
+  },
+
+  /**
+   * Exporta casos confirmados como PDF
+   */
+  async exportPdf(filters?: ConfirmedCasesFilters): Promise<void> {
+    const params = new URLSearchParams()
+    if (filters?.search) params.append('search', filters.search)
+    if (filters?.state) params.append('state', filters.state)
+    if (filters?.city) params.append('city', filters.city)
+    if (filters?.neighborhood) params.append('neighborhood', filters.neighborhood)
+    if (filters?.symptomsDateFrom) params.append('symptoms_date_from', filters.symptomsDateFrom)
+    if (filters?.symptomsDateTo) params.append('symptoms_date_to', filters.symptomsDateTo)
+    if (filters?.createdFrom) params.append('created_from', filters.createdFrom)
+    if (filters?.createdTo) params.append('created_to', filters.createdTo)
+    if (filters?.symptomId) params.append('symptom_id', String(filters.symptomId))
+
+    const response = await api.get(`/notifications/export-pdf?${params.toString()}`, {
+      responseType: 'blob',
+    })
+
+    const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }))
+    const link = document.createElement('a')
+    link.href = url
+    const date = new Date().toISOString().split('T')[0]
+    link.setAttribute('download', `casos-confirmados-${date}.pdf`)
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    window.URL.revokeObjectURL(url)
   },
 }

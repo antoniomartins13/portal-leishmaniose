@@ -8,6 +8,8 @@ use App\Mail\NotificationStatusChangedMail;
 use App\Models\Notification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Mail;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class NotificationController extends BaseController
 {
@@ -81,6 +83,23 @@ class NotificationController extends BaseController
                 $query->where('city', 'ilike', '%' . request('city') . '%');
             }
 
+            // Filtro por estado
+            if (request()->filled('state')) {
+                $query->where('state', 'ilike', '%' . request('state') . '%');
+            }
+
+            // Filtro por bairro
+            if (request()->filled('neighborhood')) {
+                $query->where('neighborhood', 'ilike', '%' . request('neighborhood') . '%');
+            }
+
+            // Filtro por sintoma específico
+            if (request()->filled('symptom_id')) {
+                $query->whereHas('symptoms', function ($q) {
+                    $q->where('symptoms.id', request('symptom_id'));
+                });
+            }
+
             // Filtro por data dos sintomas
             if (request()->filled('symptoms_date_from')) {
                 $query->whereDate('symptoms_date', '>=', request('symptoms_date_from'));
@@ -144,5 +163,193 @@ class NotificationController extends BaseController
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage(), 422);
         }
+    }
+
+    /**
+     * Exporta casos confirmados em CSV com filtros.
+     */
+    public function exportCsv(): StreamedResponse
+    {
+        $this->authorizePermission('notifications.view');
+
+        $query = Notification::with(['symptoms'])
+            ->where('status', 'confirmed')
+            ->orderBy('created_at', 'desc');
+
+        // Filtro por estado
+        if (request()->filled('state')) {
+            $query->where('state', request('state'));
+        }
+
+        // Filtro por cidade
+        if (request()->filled('city')) {
+            $query->where('city', 'ilike', '%' . request('city') . '%');
+        }
+
+        // Filtro por bairro
+        if (request()->filled('neighborhood')) {
+            $query->where('neighborhood', 'ilike', '%' . request('neighborhood') . '%');
+        }
+
+        // Filtro por data dos sintomas
+        if (request()->filled('symptoms_date_from')) {
+            $query->whereDate('symptoms_date', '>=', request('symptoms_date_from'));
+        }
+        if (request()->filled('symptoms_date_to')) {
+            $query->whereDate('symptoms_date', '<=', request('symptoms_date_to'));
+        }
+
+        // Filtro por data da notificação
+        if (request()->filled('created_from')) {
+            $query->whereDate('created_at', '>=', request('created_from'));
+        }
+        if (request()->filled('created_to')) {
+            $query->whereDate('created_at', '<=', request('created_to'));
+        }
+
+        // Filtro por sintoma específico
+        if (request()->filled('symptom_id')) {
+            $query->whereHas('symptoms', function ($q) {
+                $q->where('symptoms.id', request('symptom_id'));
+            });
+        }
+
+        // Busca textual
+        if (request()->filled('search')) {
+            $search = request('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('protocol', 'ilike', "%{$search}%")
+                    ->orWhere('name', 'ilike', "%{$search}%")
+                    ->orWhere('city', 'ilike', "%{$search}%");
+            });
+        }
+
+        $notifications = $query->get();
+
+        $filename = 'casos-confirmados-' . now()->format('Y-m-d') . '.csv';
+
+        return response()->streamDownload(function () use ($notifications) {
+            $handle = fopen('php://output', 'w');
+
+            // BOM para Excel reconhecer UTF-8
+            fwrite($handle, "\xEF\xBB\xBF");
+
+            // Header
+            fputcsv($handle, [
+                'Protocolo',
+                'Nome',
+                'CPF',
+                'E-mail',
+                'CEP',
+                'Estado',
+                'Cidade',
+                'Bairro',
+                'Data dos Sintomas',
+                'Sintomas',
+                'Detalhes',
+                'Data da Notificação',
+            ], ';');
+
+            foreach ($notifications as $n) {
+                $symptoms = $n->symptoms->pluck('name')->implode(', ');
+
+                fputcsv($handle, [
+                    $n->protocol,
+                    $n->name ?? 'Não informado',
+                    $n->cpf,
+                    $n->email,
+                    $n->cep ?? '',
+                    $n->state,
+                    $n->city,
+                    $n->neighborhood ?? '',
+                    $n->symptoms_date?->format('d/m/Y') ?? '',
+                    $symptoms,
+                    $n->details ?? '',
+                    $n->created_at->format('d/m/Y'),
+                ], ';');
+            }
+
+            fclose($handle);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
+    /**
+     * Exporta casos confirmados em PDF com filtros.
+     */
+    public function exportPdf()
+    {
+        $this->authorizePermission('notifications.view');
+
+        $query = Notification::with(['symptoms'])
+            ->where('status', 'confirmed')
+            ->orderBy('created_at', 'desc');
+
+        $activeFilters = [];
+
+        if (request()->filled('state')) {
+            $query->where('state', request('state'));
+            $activeFilters[] = 'Estado: ' . request('state');
+        }
+
+        if (request()->filled('city')) {
+            $query->where('city', 'ilike', '%' . request('city') . '%');
+            $activeFilters[] = 'Cidade: ' . request('city');
+        }
+
+        if (request()->filled('neighborhood')) {
+            $query->where('neighborhood', 'ilike', '%' . request('neighborhood') . '%');
+            $activeFilters[] = 'Bairro: ' . request('neighborhood');
+        }
+
+        if (request()->filled('symptoms_date_from')) {
+            $query->whereDate('symptoms_date', '>=', request('symptoms_date_from'));
+            $activeFilters[] = 'Sintomas a partir de: ' . request('symptoms_date_from');
+        }
+        if (request()->filled('symptoms_date_to')) {
+            $query->whereDate('symptoms_date', '<=', request('symptoms_date_to'));
+            $activeFilters[] = 'Sintomas até: ' . request('symptoms_date_to');
+        }
+
+        if (request()->filled('created_from')) {
+            $query->whereDate('created_at', '>=', request('created_from'));
+            $activeFilters[] = 'Notificação a partir de: ' . request('created_from');
+        }
+        if (request()->filled('created_to')) {
+            $query->whereDate('created_at', '<=', request('created_to'));
+            $activeFilters[] = 'Notificação até: ' . request('created_to');
+        }
+
+        if (request()->filled('symptom_id')) {
+            $query->whereHas('symptoms', function ($q) {
+                $q->where('symptoms.id', request('symptom_id'));
+            });
+            $symptomName = \App\Models\Symptom::find(request('symptom_id'))?->name ?? request('symptom_id');
+            $activeFilters[] = 'Sintoma: ' . $symptomName;
+        }
+
+        if (request()->filled('search')) {
+            $search = request('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('protocol', 'ilike', "%{$search}%")
+                    ->orWhere('name', 'ilike', "%{$search}%")
+                    ->orWhere('city', 'ilike', "%{$search}%");
+            });
+            $activeFilters[] = 'Busca: ' . $search;
+        }
+
+        $notifications = $query->get();
+
+        $pdf = Pdf::loadView('reports.confirmed-cases-pdf', [
+            'notifications' => $notifications,
+            'total' => $notifications->count(),
+            'generatedAt' => now()->format('d/m/Y H:i'),
+            'activeFilters' => $activeFilters,
+        ])->setPaper('a4', 'landscape');
+
+        $filename = 'casos-confirmados-' . now()->format('Y-m-d') . '.pdf';
+
+        return $pdf->download($filename);
     }
 }

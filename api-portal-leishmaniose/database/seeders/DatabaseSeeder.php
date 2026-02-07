@@ -16,5 +16,11 @@ class DatabaseSeeder extends Seeder
 
         // Then seed admin user
         $this->call(AdminUserSeeder::class);
+
+        // Seed symptoms
+        $this->call(SymptomSeeder::class);
+
+        // Seed sample notifications
+        $this->call(NotificationSeeder::class);
     }
 }
