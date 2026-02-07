@@ -59,6 +59,14 @@ export interface PaginatedNotifications {
   total: number
 }
 
+export interface NotificationFilters {
+  city?: string
+  symptomsDateFrom?: string
+  symptomsDateTo?: string
+  createdFrom?: string
+  createdTo?: string
+}
+
 const baseApi = new BaseApi<Notification>('notifications')
 
 export const notificationsApi = {
@@ -73,14 +81,24 @@ export const notificationsApi = {
   /**
    * Lista notificações com filtros (admin/gestor)
    */
-  async getAll(page = 1, status?: string, search?: string): Promise<PaginatedNotifications> {
+  async getAll(
+    page = 1,
+    status?: string,
+    search?: string,
+    filters?: NotificationFilters
+  ): Promise<PaginatedNotifications> {
     const params = new URLSearchParams()
     params.append('page', String(page))
     if (status && status !== 'all') params.append('status', status)
     if (search) params.append('search', search)
+    if (filters?.city) params.append('city', filters.city)
+    if (filters?.symptomsDateFrom) params.append('symptoms_date_from', filters.symptomsDateFrom)
+    if (filters?.symptomsDateTo) params.append('symptoms_date_to', filters.symptomsDateTo)
+    if (filters?.createdFrom) params.append('created_from', filters.createdFrom)
+    if (filters?.createdTo) params.append('created_to', filters.createdTo)
 
     const response = await api.get(`/notifications?${params.toString()}`)
-    return response?.data?.data ?? { data: [], current_page: 1, last_page: 1, per_page: 15, total: 0 }
+    return response?.data ?? { data: [], current_page: 1, last_page: 1, per_page: 15, total: 0 }
   },
 
   /**

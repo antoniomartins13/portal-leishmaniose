@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Filter, X } from 'lucide-react'
 import { Notification } from '../../api/resources/notificationsApi'
+import { NotificationFilters } from '../../api/resources/notificationsApi'
 import { NotificationsTable } from '../../components/Admin/NotificationsTable'
 import { NotificationDetailModal } from '../../components/Admin/NotificationDetailModal'
 import { useNotifications } from '../../hooks/useNotifications'
@@ -21,8 +22,10 @@ export const NotificationsPage: React.FC = () => {
         pagination,
         statusFilter,
         searchTerm,
+        filters,
         setStatusFilter,
         setSearchTerm,
+        setFilters,
         loadNotifications,
         updateStatus,
     } = useNotifications()
@@ -32,11 +35,15 @@ export const NotificationsPage: React.FC = () => {
 
     const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null)
     const [isDetailOpen, setIsDetailOpen] = useState(false)
+    const [showFilters, setShowFilters] = useState(false)
+
+    // Filtros locais para o formulário
+    const [localFilters, setLocalFilters] = useState<NotificationFilters>({})
 
     // Carrega ao montar e quando filtros mudam
     useEffect(() => {
-        loadNotifications(1, statusFilter, searchTerm)
-    }, [statusFilter]) // eslint-disable-line react-hooks/exhaustive-deps
+        loadNotifications(1, statusFilter, searchTerm, filters)
+    }, [statusFilter, filters]) // eslint-disable-line react-hooks/exhaustive-deps
 
     // Debounce de busca
     const [searchTimeout, setSearchTimeout] = useState<ReturnType<typeof setTimeout> | null>(null)
@@ -46,16 +53,29 @@ export const NotificationsPage: React.FC = () => {
             setSearchTerm(value)
             if (searchTimeout) clearTimeout(searchTimeout)
             const timeout = setTimeout(() => {
-                loadNotifications(1, statusFilter, value)
+                loadNotifications(1, statusFilter, value, filters)
             }, 400)
             setSearchTimeout(timeout)
         },
-        [statusFilter, loadNotifications, searchTimeout, setSearchTerm]
+        [statusFilter, filters, loadNotifications, searchTimeout, setSearchTerm]
     )
 
     const handlePageChange = (page: number) => {
-        loadNotifications(page, statusFilter, searchTerm)
+        loadNotifications(page, statusFilter, searchTerm, filters)
     }
+
+    const handleApplyFilters = () => {
+        setFilters(localFilters)
+        setShowFilters(false)
+    }
+
+    const handleClearFilters = () => {
+        setLocalFilters({})
+        setFilters({})
+        setShowFilters(false)
+    }
+
+    const hasActiveFilters = Object.values(filters).some((v) => v)
 
     const handleView = (notification: Notification) => {
         setSelectedNotification(notification)
@@ -87,8 +107,8 @@ export const NotificationsPage: React.FC = () => {
                             key={tab.value}
                             onClick={() => setStatusFilter(tab.value)}
                             className={`px-4 py-2 rounded-lg font-medium text-sm transition ${statusFilter === tab.value
-                                    ? 'bg-teal-700 text-white'
-                                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
+                                ? 'bg-teal-700 text-white'
+                                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
                                 }`}
                         >
                             {tab.label}
@@ -96,16 +116,124 @@ export const NotificationsPage: React.FC = () => {
                     ))}
                 </div>
 
-                {/* Search */}
-                <div className="mb-8">
+                {/* Search + Filter Toggle */}
+                <div className="flex items-center gap-3 mb-4">
                     <input
                         type="text"
                         placeholder="Buscar por protocolo, nome ou cidade..."
                         value={searchTerm}
                         onChange={(e) => handleSearchChange(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700"
+                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700"
                     />
+                    <button
+                        onClick={() => setShowFilters(!showFilters)}
+                        className={`inline-flex items-center space-x-2 px-4 py-2 rounded-lg font-medium text-sm border transition ${hasActiveFilters
+                            ? 'bg-teal-700 text-white border-teal-700'
+                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                            }`}
+                    >
+                        <Filter size={16} />
+                        <span>Filtros</span>
+                        {hasActiveFilters && (
+                            <span className="bg-white text-teal-700 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                                !
+                            </span>
+                        )}
+                    </button>
                 </div>
+
+                {/* Filters Panel */}
+                {showFilters && (
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="font-semibold text-gray-800">Filtros Avançados</h3>
+                            <button
+                                onClick={() => setShowFilters(false)}
+                                className="text-gray-400 hover:text-gray-600 transition"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {/* Data Sintomas - De */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Data Sintomas - De
+                                </label>
+                                <input
+                                    type="date"
+                                    value={localFilters.symptomsDateFrom ?? ''}
+                                    onChange={(e) =>
+                                        setLocalFilters((f) => ({ ...f, symptomsDateFrom: e.target.value }))
+                                    }
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700 text-sm"
+                                />
+                            </div>
+
+                            {/* Data Sintomas - Até */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Data Sintomas - Até
+                                </label>
+                                <input
+                                    type="date"
+                                    value={localFilters.symptomsDateTo ?? ''}
+                                    onChange={(e) =>
+                                        setLocalFilters((f) => ({ ...f, symptomsDateTo: e.target.value }))
+                                    }
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700 text-sm"
+                                />
+                            </div>
+
+                            {/* Data Notificação - De */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Data Notificação - De
+                                </label>
+                                <input
+                                    type="date"
+                                    value={localFilters.createdFrom ?? ''}
+                                    onChange={(e) =>
+                                        setLocalFilters((f) => ({ ...f, createdFrom: e.target.value }))
+                                    }
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700 text-sm"
+                                />
+                            </div>
+
+                            {/* Data Notificação - Até */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Data Notificação - Até
+                                </label>
+                                <input
+                                    type="date"
+                                    value={localFilters.createdTo ?? ''}
+                                    onChange={(e) =>
+                                        setLocalFilters((f) => ({ ...f, createdTo: e.target.value }))
+                                    }
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700 text-sm"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Filter Actions */}
+                        <div className="flex items-center justify-end gap-3 mt-4 pt-4 border-t border-gray-200">
+                            <button
+                                onClick={handleClearFilters}
+                                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition"
+                            >
+                                Limpar filtros
+                            </button>
+                            <button
+                                onClick={handleApplyFilters}
+                                className="px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white rounded-lg font-semibold text-sm transition"
+                            >
+                                Aplicar
+                            </button>
+                        </div>
+                    </div>
+                )}
 
                 {/* Table */}
                 <NotificationsTable

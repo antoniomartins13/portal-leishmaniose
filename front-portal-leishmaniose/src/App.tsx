@@ -42,13 +42,10 @@ const RootApp: React.FC = () => {
             <Route path="/noticias" element={<NewsPage />} />
             <Route path="/sobre" element={<AboutPage />} />
 
-            {/* Protected Routes - Notifications (gestor/admin) */}
+            {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
               <Route path="/gerenciar-notificacoes" element={<NotificationsPage />} />
-            </Route>
 
-            {/* Protected Admin Routes */}
-            <Route element={<ProtectedRoute />}>
               <Route path="/admin" element={<AdminLayout />}>
                 <Route index element={<RolesPage />} />
                 <Route path="usuarios" element={<AdminPage />} />

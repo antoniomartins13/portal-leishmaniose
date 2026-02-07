@@ -75,6 +75,27 @@ class NotificationController extends BaseController
                 });
             }
 
+            // Filtro por cidade
+            if (request()->filled('city')) {
+                $query->where('city', 'ilike', '%' . request('city') . '%');
+            }
+
+            // Filtro por data dos sintomas
+            if (request()->filled('symptoms_date_from')) {
+                $query->whereDate('symptoms_date', '>=', request('symptoms_date_from'));
+            }
+            if (request()->filled('symptoms_date_to')) {
+                $query->whereDate('symptoms_date', '<=', request('symptoms_date_to'));
+            }
+
+            // Filtro por data da notificação (created_at)
+            if (request()->filled('created_from')) {
+                $query->whereDate('created_at', '>=', request('created_from'));
+            }
+            if (request()->filled('created_to')) {
+                $query->whereDate('created_at', '<=', request('created_to'));
+            }
+
             $notifications = $query->paginate(15);
 
             return $this->sendResponse($notifications, 'Notificações listadas com sucesso');
