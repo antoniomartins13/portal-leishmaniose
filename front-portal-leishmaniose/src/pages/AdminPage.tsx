@@ -9,7 +9,8 @@ interface User {
   id: number
   name: string
   email: string
-  role: string
+  role?: string
+  roles?: { id: number; name: string }[]
   created_at: string
 }
 
@@ -40,6 +41,8 @@ export const AdminPage: React.FC = () => {
   const handleAddUser = async (data: CreateUserFormData) => {
     try {
       await createUser(data)
+      // Recarrega a lista para ter dados completos (incluindo roles)
+      await fetchUsers(1, searchTerm || undefined, roleFilter === 'all' ? undefined : roleFilter)
     } catch (error) {
       console.error('Erro ao criar usuário:', error)
     }
@@ -48,6 +51,8 @@ export const AdminPage: React.FC = () => {
   const handleEditUser = async (selectedUser: User, data: EditUserFormData) => {
     try {
       await updateUser(selectedUser.id, data)
+      // Recarrega a lista para ter dados completos (incluindo roles)
+      await fetchUsers(1, searchTerm || undefined, roleFilter === 'all' ? undefined : roleFilter)
       setIsEditUserModalOpen(false)
       setSelectedUserForEdit(undefined)
     } catch (error) {

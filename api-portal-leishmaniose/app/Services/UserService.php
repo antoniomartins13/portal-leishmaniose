@@ -71,14 +71,18 @@ class UserService extends BaseService
             unset($data['password']);
         }
 
-        $updatedUser = $this->userRepository->update($user->id, $data);
+        // Atualiza os dados do usuário (exceto role que é tratado separadamente)
+        $userData = $data;
+        unset($userData['role']);
+        
+        $user->update($userData);
 
         // Sincronizar roles se fornecido
         if (isset($data['role'])) {
-            $updatedUser->syncRoles($data['role']);
+            $user->syncRoles($data['role']);
         }
 
-        return $updatedUser;
+        return $user->fresh(['roles']);
     }
 
     /**
