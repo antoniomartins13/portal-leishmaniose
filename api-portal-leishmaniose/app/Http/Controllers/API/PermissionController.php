@@ -4,11 +4,35 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\JsonResponse;
 use Spatie\Permission\Models\Permission;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Tag(
+ *   name="Permissoes",
+ *   description="Permissoes disponiveis"
+ * )
+ */
 class PermissionController extends BaseController
 {
     /**
      * Lista todas as permissões disponíveis
+        *
+        * @OA\Get(
+        *   path="/api/permissions",
+        *   tags={"Permissoes"},
+        *   summary="Listar permissoes",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\Response(
+        *     response=200,
+        *     description="Lista de permissoes",
+        *     @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Permission"))
+        *   ),
+        *   @OA\Response(
+        *     response=401,
+        *     description="Nao autenticado",
+        *     @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+        *   )
+        * )
      */
     public function index(): JsonResponse
     {

@@ -6,11 +6,35 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Tag(
+ *   name="Grupos",
+ *   description="Gestao de grupos e permissoes"
+ * )
+ */
 class RoleController extends BaseController
 {
     /**
      * Lista todos os grupos (admin only)
+        *
+        * @OA\Get(
+        *   path="/api/roles",
+        *   tags={"Grupos"},
+        *   summary="Listar grupos",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\Response(
+        *     response=200,
+        *     description="Lista de grupos",
+        *     @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Role"))
+        *   ),
+        *   @OA\Response(
+        *     response=401,
+        *     description="Nao autenticado",
+        *     @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+        *   )
+        * )
      */
     public function index(): JsonResponse
     {
@@ -26,6 +50,27 @@ class RoleController extends BaseController
 
     /**
      * Cria um novo grupo
+        *
+        * @OA\Post(
+        *   path="/api/roles",
+        *   tags={"Grupos"},
+        *   summary="Criar grupo",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\RequestBody(
+        *     required=true,
+        *     @OA\JsonContent(ref="#/components/schemas/RoleCreateRequest")
+        *   ),
+        *   @OA\Response(
+        *     response=201,
+        *     description="Grupo criado",
+        *     @OA\JsonContent(ref="#/components/schemas/Role")
+        *   ),
+        *   @OA\Response(
+        *     response=422,
+        *     description="Falha de validacao",
+        *     @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+        *   )
+        * )
      */
     public function store(Request $request): JsonResponse
     {
@@ -55,6 +100,29 @@ class RoleController extends BaseController
 
     /**
      * Exibe um grupo com suas permissões
+        *
+        * @OA\Get(
+        *   path="/api/roles/{role}",
+        *   tags={"Grupos"},
+        *   summary="Detalhar grupo",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\Parameter(
+        *     name="role",
+        *     in="path",
+        *     required=true,
+        *     @OA\Schema(type="integer")
+        *   ),
+        *   @OA\Response(
+        *     response=200,
+        *     description="Grupo recuperado",
+        *     @OA\JsonContent(ref="#/components/schemas/Role")
+        *   ),
+        *   @OA\Response(
+        *     response=401,
+        *     description="Nao autenticado",
+        *     @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+        *   )
+        * )
      */
     public function show(Role $role): JsonResponse
     {
@@ -70,6 +138,33 @@ class RoleController extends BaseController
 
     /**
      * Atualiza permissões de um grupo
+        *
+        * @OA\Patch(
+        *   path="/api/roles/{role}",
+        *   tags={"Grupos"},
+        *   summary="Atualizar grupo",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\Parameter(
+        *     name="role",
+        *     in="path",
+        *     required=true,
+        *     @OA\Schema(type="integer")
+        *   ),
+        *   @OA\RequestBody(
+        *     required=true,
+        *     @OA\JsonContent(ref="#/components/schemas/RoleUpdateRequest")
+        *   ),
+        *   @OA\Response(
+        *     response=200,
+        *     description="Grupo atualizado",
+        *     @OA\JsonContent(ref="#/components/schemas/Role")
+        *   ),
+        *   @OA\Response(
+        *     response=422,
+        *     description="Falha de validacao",
+        *     @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+        *   )
+        * )
      */
     public function update(Request $request, Role $role): JsonResponse
     {
@@ -102,6 +197,29 @@ class RoleController extends BaseController
 
     /**
      * Deleta um grupo
+        *
+        * @OA\Delete(
+        *   path="/api/roles/{role}",
+        *   tags={"Grupos"},
+        *   summary="Deletar grupo",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\Parameter(
+        *     name="role",
+        *     in="path",
+        *     required=true,
+        *     @OA\Schema(type="integer")
+        *   ),
+        *   @OA\Response(
+        *     response=200,
+        *     description="Grupo removido",
+        *     @OA\JsonContent(type="object")
+        *   ),
+        *   @OA\Response(
+        *     response=422,
+        *     description="Falha ao remover",
+        *     @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+        *   )
+        * )
      */
     public function destroy(Role $role): JsonResponse
     {

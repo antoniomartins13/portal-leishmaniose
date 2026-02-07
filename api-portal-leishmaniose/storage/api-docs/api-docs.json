@@ -1,0 +1,2266 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Portal Leishmaniose API",
+        "description": "Documentacao da API do Portal Leishmaniose",
+        "contact": {
+            "email": ""
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/",
+            "description": "Servidor padrao"
+        }
+    ],
+    "paths": {
+        "/api/auth/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Registrar usuario",
+                "description": "Register a new user.",
+                "operationId": "34ab810078542f254a984bd61c2a4cf9",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AuthRegisterRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Usuario registrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthRegisterResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Falha no registro",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Login de usuario",
+                "description": "Login user.",
+                "operationId": "2830f27bbe50147c13dec26249656cbc",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AuthLoginRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login realizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthLoginResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Credenciais invalidas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logout do usuario",
+                "description": "Logout user (revoke current token).",
+                "operationId": "58e98af97c9b782fa7a9fb5e133a05cc",
+                "responses": {
+                    "200": {
+                        "description": "Logout realizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Nao autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/profile": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Perfil do usuario autenticado",
+                "description": "Get authenticated user profile.",
+                "operationId": "c4a4ee04850425dcbfde58100b116e44",
+                "responses": {
+                    "200": {
+                        "description": "Perfil recuperado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthProfileResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Nao autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/logout-all": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logout de todos os dispositivos",
+                "description": "Logout from all devices (revoke all tokens).",
+                "operationId": "4e498a53ff72724f25da23afd0de9e1e",
+                "responses": {
+                    "200": {
+                        "description": "Logout total realizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Nao autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/notifications": {
+            "get": {
+                "tags": [
+                    "Notificacoes"
+                ],
+                "summary": "Listar notificacoes",
+                "description": "Lista todas as notificações (admin/gestor).",
+                "operationId": "0bb334cc4f9efd4fc1e6a0b32d8cd65d",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "city",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "state",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "neighborhood",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "symptom_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "symptoms_date_from",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "symptoms_date_to",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "created_from",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "created_to",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de notificacoes",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotificationListResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Nao autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Notificacoes"
+                ],
+                "summary": "Registrar notificacao",
+                "description": "Cria uma nova notificação de caso.\nEsta rota é pública - não precisa de autenticação.",
+                "operationId": "ce0b3bfe096237d37c937fc1551ff4da",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/NotificationCreateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Notificacao criada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NotificationCreatedResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro ao registrar",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/notifications/{notification}": {
+            "get": {
+                "tags": [
+                    "Notificacoes"
+                ],
+                "summary": "Detalhar notificacao",
+                "description": "Exibe uma notificação específica.",
+                "operationId": "0349a6c64805580edce103c79f91f102",
+                "parameters": [
+                    {
+                        "name": "notification",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Notificacao recuperada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Notification"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Nao autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/notifications/{notification}/status": {
+            "patch": {
+                "tags": [
+                    "Notificacoes"
+                ],
+                "summary": "Atualizar status",
+                "description": "Atualiza o status de uma notificação.",
+                "operationId": "5a3e7efd631add13468f300f6daa6149",
+                "parameters": [
+                    {
+                        "name": "notification",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/NotificationStatusUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Status atualizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Notification"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Falha de validacao",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/notifications/export-csv": {
+            "get": {
+                "tags": [
+                    "Notificacoes"
+                ],
+                "summary": "Exportar casos confirmados (CSV)",
+                "description": "Exporta casos confirmados em CSV com filtros.",
+                "operationId": "d25e470459f213ba6dbbfeca7ef2fff8",
+                "parameters": [
+                    {
+                        "name": "state",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "city",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "neighborhood",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "symptoms_date_from",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "symptoms_date_to",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "created_from",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "created_to",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "symptom_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Arquivo CSV",
+                        "content": {
+                            "text/csv": {}
+                        }
+                    },
+                    "401": {
+                        "description": "Nao autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/notifications/export-pdf": {
+            "get": {
+                "tags": [
+                    "Notificacoes"
+                ],
+                "summary": "Exportar casos confirmados (PDF)",
+                "description": "Exporta casos confirmados em PDF com filtros.",
+                "operationId": "1377701ac18ecbd16ffa4d82060c2e54",
+                "parameters": [
+                    {
+                        "name": "state",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "city",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "neighborhood",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "symptoms_date_from",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "symptoms_date_to",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "created_from",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "created_to",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "symptom_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Arquivo PDF",
+                        "content": {
+                            "application/pdf": {}
+                        }
+                    },
+                    "401": {
+                        "description": "Nao autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/permissions": {
+            "get": {
+                "tags": [
+                    "Permissoes"
+                ],
+                "summary": "Listar permissoes",
+                "description": "Lista todas as permissões disponíveis",
+                "operationId": "3e9ee7de4ce268383cf051894d4c462a",
+                "responses": {
+                    "200": {
+                        "description": "Lista de permissoes",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Permission"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Nao autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/roles": {
+            "get": {
+                "tags": [
+                    "Grupos"
+                ],
+                "summary": "Listar grupos",
+                "description": "Lista todos os grupos (admin only)",
+                "operationId": "6cd48af64dafcf1c85923dba47e841a4",
+                "responses": {
+                    "200": {
+                        "description": "Lista de grupos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Role"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Nao autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Grupos"
+                ],
+                "summary": "Criar grupo",
+                "description": "Cria um novo grupo",
+                "operationId": "4eb1ce389f63b4dbfcc5b002014636e1",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RoleCreateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Grupo criado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Role"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Falha de validacao",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/roles/{role}": {
+            "get": {
+                "tags": [
+                    "Grupos"
+                ],
+                "summary": "Detalhar grupo",
+                "description": "Exibe um grupo com suas permissões",
+                "operationId": "5c9cb7ef647c802ae2e746aeb9951074",
+                "parameters": [
+                    {
+                        "name": "role",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Grupo recuperado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Role"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Nao autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Grupos"
+                ],
+                "summary": "Deletar grupo",
+                "description": "Deleta um grupo",
+                "operationId": "bb985b7ba1bc05fa10151a5ba53b776d",
+                "parameters": [
+                    {
+                        "name": "role",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Grupo removido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Falha ao remover",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Grupos"
+                ],
+                "summary": "Atualizar grupo",
+                "description": "Atualiza permissões de um grupo",
+                "operationId": "8e1a4730f6fa9da1a1cbc02e066cf60c",
+                "parameters": [
+                    {
+                        "name": "role",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RoleUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Grupo atualizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Role"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Falha de validacao",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/symptoms": {
+            "get": {
+                "tags": [
+                    "Sintomas"
+                ],
+                "summary": "Listar sintomas ativos",
+                "description": "Lista todos os sintomas ativos.\nEsta rota é pública - não precisa de autenticação.",
+                "operationId": "acd84a2aa5c12130b3445c5df09708ec",
+                "responses": {
+                    "200": {
+                        "description": "Lista de sintomas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Symptom"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erro ao listar",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Sintomas"
+                ],
+                "summary": "Criar sintoma",
+                "description": "Cria um novo sintoma (admin only).",
+                "operationId": "ea154f4f2c950b474b6da4c0904118f0",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Febre"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Sintoma comum",
+                                        "nullable": true
+                                    },
+                                    "active": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Sintoma criado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Symptom"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Falha de validacao",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/symptoms/all": {
+            "get": {
+                "tags": [
+                    "Sintomas"
+                ],
+                "summary": "Listar sintomas (admin)",
+                "description": "Lista todos os sintomas (ativos e inativos) para o painel admin.\nRequer autenticação e permissão symptoms.view.",
+                "operationId": "46e94518bb91abbe24b06be49a626645",
+                "responses": {
+                    "200": {
+                        "description": "Lista de sintomas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Symptom"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Nao autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/symptoms/{symptom}": {
+            "delete": {
+                "tags": [
+                    "Sintomas"
+                ],
+                "summary": "Remover sintoma",
+                "description": "Remove um sintoma (admin only).",
+                "operationId": "b3a5bd0798c455d586473d5af8b7ca06",
+                "parameters": [
+                    {
+                        "name": "symptom",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Sintoma removido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Falha ao remover",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Sintomas"
+                ],
+                "summary": "Atualizar sintoma",
+                "description": "Atualiza um sintoma (admin only).",
+                "operationId": "f82875d0fb5fb170bb29631a8d047d21",
+                "parameters": [
+                    {
+                        "name": "symptom",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Febre persistente"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Sintoma frequente",
+                                        "nullable": true
+                                    },
+                                    "active": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Sintoma atualizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Symptom"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Falha de validacao",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/users": {
+            "get": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Listar usuarios",
+                "description": "Lista todos os usuários (admin only)",
+                "operationId": "d7a57f4d7de18fb0f92501172472c9b6",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Busca por nome ou email",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "role",
+                        "in": "query",
+                        "description": "Filtro por grupo",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de usuarios",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserListResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Nao autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Criar usuario",
+                "description": "Cria um novo usuário (admin only)",
+                "operationId": "9fea6f2adcb69614c521a7733358382d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserCreateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Usuario criado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Falha de validacao",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/users/{user}": {
+            "get": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Detalhar usuario",
+                "description": "Exibe um usuário específico",
+                "operationId": "8ef94a31920758a2ea8c4a11c4a85c73",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Usuario recuperado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Nao autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Deletar usuario",
+                "description": "Deleta um usuário (admin only)",
+                "operationId": "d2769c9ccb9342ab54329ddb86aa438c",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Usuario removido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Falha ao remover",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Atualizar usuario",
+                "description": "Atualiza um usuário existente (admin only)",
+                "operationId": "049ff99b04d4a5c8617743ec01195cd1",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UserUpdateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Usuario atualizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Falha de validacao",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "AuthLoginRequest": {
+                "required": [
+                    "email",
+                    "password"
+                ],
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "example": "admin@exemplo.com"
+                    },
+                    "password": {
+                        "type": "string",
+                        "example": "Senha#123"
+                    }
+                },
+                "type": "object"
+            },
+            "AuthLoginResponse": {
+                "required": [
+                    "user",
+                    "token"
+                ],
+                "properties": {
+                    "user": {
+                        "$ref": "#/components/schemas/AuthUser"
+                    },
+                    "token": {
+                        "type": "string",
+                        "example": "1|token_exemplo"
+                    }
+                },
+                "type": "object"
+            },
+            "AuthProfileResponse": {
+                "required": [
+                    "user"
+                ],
+                "properties": {
+                    "user": {
+                        "$ref": "#/components/schemas/User"
+                    }
+                },
+                "type": "object"
+            },
+            "AuthRegisterRequest": {
+                "required": [
+                    "name",
+                    "email",
+                    "password",
+                    "password_confirmation"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Joao Silva"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "joao@exemplo.com"
+                    },
+                    "password": {
+                        "type": "string",
+                        "example": "Senha#123"
+                    },
+                    "password_confirmation": {
+                        "type": "string",
+                        "example": "Senha#123"
+                    }
+                },
+                "type": "object"
+            },
+            "AuthRegisterResponse": {
+                "required": [
+                    "user",
+                    "token"
+                ],
+                "properties": {
+                    "user": {
+                        "$ref": "#/components/schemas/AuthUser"
+                    },
+                    "token": {
+                        "type": "string",
+                        "example": "1|token_exemplo"
+                    }
+                },
+                "type": "object"
+            },
+            "AuthUser": {
+                "required": [
+                    "id",
+                    "name",
+                    "email",
+                    "roles",
+                    "permissions"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Maria Souza"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "maria@exemplo.com"
+                    },
+                    "roles": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "admin"
+                        ]
+                    },
+                    "permissions": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "users.view",
+                            "notifications.view"
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorResponse": {
+                "required": [
+                    "errors"
+                ],
+                "properties": {
+                    "errors": {
+                        "type": "string",
+                        "example": "Falha de validacao"
+                    },
+                    "messages": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "Detalhe do erro"
+                        ],
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "NotificationCreateRequest": {
+                "required": [
+                    "cpf",
+                    "email",
+                    "cep",
+                    "state",
+                    "city",
+                    "symptoms_date"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Pessoa Notificante",
+                        "nullable": true
+                    },
+                    "cpf": {
+                        "type": "string",
+                        "example": "000.000.000-00"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "contato@exemplo.com"
+                    },
+                    "cep": {
+                        "type": "string",
+                        "example": "49000-000"
+                    },
+                    "state": {
+                        "type": "string",
+                        "example": "SE"
+                    },
+                    "city": {
+                        "type": "string",
+                        "example": "Aracaju"
+                    },
+                    "neighborhood": {
+                        "type": "string",
+                        "example": "Centro",
+                        "nullable": true
+                    },
+                    "symptoms_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2026-02-07"
+                    },
+                    "symptom_ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "example": [
+                            1,
+                            2
+                        ],
+                        "nullable": true
+                    },
+                    "details": {
+                        "type": "string",
+                        "example": "Manchas avermelhadas",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "NotificationCreatedResponse": {
+                "required": [
+                    "id",
+                    "protocol"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 100
+                    },
+                    "protocol": {
+                        "type": "string",
+                        "example": "LEI-2026-00010"
+                    }
+                },
+                "type": "object"
+            },
+            "NotificationListResponse": {
+                "required": [
+                    "current_page",
+                    "data",
+                    "total"
+                ],
+                "properties": {
+                    "current_page": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Notification"
+                        }
+                    },
+                    "first_page_url": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "from": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "last_page": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "last_page_url": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "links": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "url": {
+                                    "type": "string",
+                                    "nullable": true
+                                },
+                                "label": {
+                                    "type": "string"
+                                },
+                                "active": {
+                                    "type": "boolean"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "next_page_url": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "path": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "per_page": {
+                        "type": "integer",
+                        "example": 15
+                    },
+                    "prev_page_url": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "to": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "total": {
+                        "type": "integer",
+                        "example": 1
+                    }
+                },
+                "type": "object"
+            },
+            "Notification": {
+                "required": [
+                    "id",
+                    "protocol",
+                    "cpf",
+                    "email",
+                    "cep",
+                    "state",
+                    "city",
+                    "symptoms_date",
+                    "status"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 100
+                    },
+                    "protocol": {
+                        "type": "string",
+                        "example": "LEI-2026-00010"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Pessoa Notificante",
+                        "nullable": true
+                    },
+                    "cpf": {
+                        "type": "string",
+                        "example": "000.000.000-00"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "contato@exemplo.com"
+                    },
+                    "cep": {
+                        "type": "string",
+                        "example": "49000-000"
+                    },
+                    "state": {
+                        "type": "string",
+                        "example": "SE"
+                    },
+                    "city": {
+                        "type": "string",
+                        "example": "Aracaju"
+                    },
+                    "neighborhood": {
+                        "type": "string",
+                        "example": "Centro",
+                        "nullable": true
+                    },
+                    "symptoms_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2026-02-07"
+                    },
+                    "details": {
+                        "type": "string",
+                        "example": "Manchas avermelhadas",
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "pending"
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 5,
+                        "nullable": true
+                    },
+                    "user": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/User"
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "symptoms": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Symptom"
+                        },
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "NotificationStatusUpdateRequest": {
+                "required": [
+                    "status"
+                ],
+                "properties": {
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "in_analysis",
+                            "confirmed",
+                            "discarded"
+                        ],
+                        "example": "confirmed"
+                    }
+                },
+                "type": "object"
+            },
+            "Permission": {
+                "required": [
+                    "id",
+                    "name"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "users.view"
+                    }
+                },
+                "type": "object"
+            },
+            "RoleCreateRequest": {
+                "required": [
+                    "name"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "gestor"
+                    },
+                    "permissions": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "users.view",
+                            "notifications.view"
+                        ],
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "Role": {
+                "required": [
+                    "id",
+                    "name"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "admin"
+                    },
+                    "permissions_count": {
+                        "type": "integer",
+                        "example": 12,
+                        "nullable": true
+                    },
+                    "permissions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Permission"
+                        },
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "RoleUpdateRequest": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "pesquisador"
+                    },
+                    "permissions": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "users.view"
+                        ],
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "Symptom": {
+                "required": [
+                    "id",
+                    "name",
+                    "slug",
+                    "active"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Febre"
+                    },
+                    "slug": {
+                        "type": "string",
+                        "example": "febre"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Sintoma comum",
+                        "nullable": true
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "UserCreateRequest": {
+                "required": [
+                    "name",
+                    "email",
+                    "password",
+                    "role"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Novo Usuario"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "novo@exemplo.com"
+                    },
+                    "password": {
+                        "type": "string",
+                        "example": "Senha#123"
+                    },
+                    "role": {
+                        "type": "string",
+                        "example": "gestor"
+                    }
+                },
+                "type": "object"
+            },
+            "UserListResponse": {
+                "required": [
+                    "current_page",
+                    "data",
+                    "total"
+                ],
+                "properties": {
+                    "current_page": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/User"
+                        }
+                    },
+                    "first_page_url": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "from": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "last_page": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "last_page_url": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "links": {
+                        "type": "array",
+                        "items": {
+                            "properties": {
+                                "url": {
+                                    "type": "string",
+                                    "nullable": true
+                                },
+                                "label": {
+                                    "type": "string"
+                                },
+                                "active": {
+                                    "type": "boolean"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "next_page_url": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "path": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "per_page": {
+                        "type": "integer",
+                        "example": 15
+                    },
+                    "prev_page_url": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "to": {
+                        "type": "integer",
+                        "nullable": true
+                    },
+                    "total": {
+                        "type": "integer",
+                        "example": 1
+                    }
+                },
+                "type": "object"
+            },
+            "User": {
+                "required": [
+                    "id",
+                    "name",
+                    "email"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Gestor Regional"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "gestor@exemplo.com"
+                    },
+                    "role": {
+                        "type": "string",
+                        "example": "gestor",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "UserUpdateRequest": {
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Usuario Atualizado"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "usuario@exemplo.com"
+                    },
+                    "password": {
+                        "type": "string",
+                        "example": "Senha#123",
+                        "nullable": true
+                    },
+                    "role": {
+                        "type": "string",
+                        "example": "pesquisador"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "name": "bearerAuth",
+                "in": "header",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Auth",
+            "description": "Autenticacao e perfil"
+        },
+        {
+            "name": "Notificacoes",
+            "description": "Casos de leishmaniose"
+        },
+        {
+            "name": "Permissoes",
+            "description": "Permissoes disponiveis"
+        },
+        {
+            "name": "Grupos",
+            "description": "Gestao de grupos e permissoes"
+        },
+        {
+            "name": "Sintomas",
+            "description": "Sintomas relacionados a notificacoes"
+        },
+        {
+            "name": "Usuarios",
+            "description": "Gestao de usuarios"
+        }
+    ]
+}
