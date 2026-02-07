@@ -35,21 +35,28 @@ export const AdminLayout: React.FC = () => {
 
                     {/* Menu Items */}
                     <nav className="space-y-1">
-                        {menuItems.map((item) => (
-                            <NavLink
-                                key={item.path}
-                                to={item.path}
-                                className={({ isActive }) =>
-                                    `flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${isActive
-                                        ? 'bg-teal-600 text-white'
-                                        : 'text-teal-100 hover:bg-teal-700'
-                                    }`
-                                }
-                            >
-                                {item.icon}
-                                <span className="font-medium">{item.label}</span>
-                            </NavLink>
-                        ))}
+                        {menuItems.map((item) => {
+                            // Grupos deve ficar ativo em /admin e /admin/grupos
+                            const isGruposItem = item.path === '/admin/grupos';
+
+                            return (
+                                <NavLink
+                                    key={item.path}
+                                    to={item.path}
+                                    className={({ isActive }) => {
+                                        const shouldBeActive = isActive ||
+                                            (isGruposItem && window.location.pathname === '/admin');
+                                        return `flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${shouldBeActive
+                                                ? 'bg-teal-600 text-white'
+                                                : 'text-teal-100 hover:bg-teal-700'
+                                            }`;
+                                    }}
+                                >
+                                    {item.icon}
+                                    <span className="font-medium">{item.label}</span>
+                                </NavLink>
+                            );
+                        })}
                     </nav>
 
                     {/* Back to site link */}

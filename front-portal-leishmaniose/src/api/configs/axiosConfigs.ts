@@ -7,7 +7,7 @@ import axios, {
 import toast from 'react-hot-toast'
 
 let currentRoute = window.location.pathname
-const abortController = new AbortController()
+let abortController = new AbortController()
 
 const api: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_APP_API_URL || 'http://localhost:8000/api',
@@ -21,9 +21,11 @@ api.interceptors.request.use(
     const tokenString = localStorage.getItem('token')
     const accessToken = tokenString ? JSON.parse(tokenString) : null
 
+    // Se a rota mudou, aborta requisições pendentes E cria um NOVO controller
     if (window.location.pathname !== currentRoute) {
-      currentRoute = window.location.pathname
       abortController.abort()
+      abortController = new AbortController()  // Cria novo controller!
+      currentRoute = window.location.pathname
     }
 
     if (accessToken) {
