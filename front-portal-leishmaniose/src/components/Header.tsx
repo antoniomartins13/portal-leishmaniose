@@ -30,7 +30,7 @@ export function Header() {
         navigate('/');
     };
 
-    const canAccessAdmin = user && (hasRole('admin') || hasRole('gestor') || hasRole('pesquisador'));
+    const canAccessAdmin = user && hasRole('admin');
 
     return (
         <header className="bg-teal-700 text-white shadow-md">
