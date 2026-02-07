@@ -4,8 +4,6 @@ import { rolesApi } from '../api/resources/rolesApi'
 interface Role {
   id?: string
   name: string
-  display_name?: string
-  description?: string
   permissions_count?: number
 }
 
@@ -46,11 +44,34 @@ export const useRoles = () => {
     }
   }, [])
 
+  const updateRole = useCallback(async (id: string, data: any) => {
+    try {
+      const updated = await rolesApi.update(id, data)
+      setRoles((prev) => prev.map((r) => ((r.id || r.name) === id ? updated : r)))
+      return updated
+    } catch (error) {
+      console.error('Erro ao atualizar grupo:', error)
+      throw error
+    }
+  }, [])
+
+  const fetchPermissions = useCallback(async () => {
+    try {
+      const response = await rolesApi.getPermissions()
+      return response.data || response
+    } catch (error) {
+      console.error('Erro ao buscar permissões:', error)
+      throw error
+    }
+  }, [])
+
   return {
     roles,
     loading,
     fetchRoles,
     createRole,
     deleteRole,
+    updateRole,
+    fetchPermissions,
   }
 }

@@ -27,6 +27,7 @@ class PermissionsSeeder extends Seeder
             // Roles
             'roles.view',
             'roles.create',
+            'roles.edit',
             'roles.delete',
 
             // Cases

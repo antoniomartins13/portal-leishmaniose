@@ -3,16 +3,28 @@ import { Plus } from 'lucide-react'
 import { useRoles } from '../hooks/useRoles'
 import { RolesTable } from '../components/Admin/RolesTable'
 import { AddRoleModal } from '../components/Admin/AddRoleModal'
+import { EditRoleModal } from '../components/Admin/EditRoleModal'
 
 export const RolesPage: React.FC = () => {
   const [isAddRoleModalOpen, setIsAddRoleModalOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
 
-  const { roles, loading, fetchRoles, createRole, deleteRole } = useRoles()
+  const { roles, loading, fetchRoles, createRole, deleteRole, updateRole, fetchPermissions } = useRoles()
+  const [isEditRoleModalOpen, setIsEditRoleModalOpen] = useState(false)
+  const [selectedRole, setSelectedRole] = useState<any | undefined>()
+  const [permissions, setPermissions] = useState<any[]>([])
 
   // Carregar roles ao montar o componente
   useEffect(() => {
     fetchRoles()
+    ;(async () => {
+      try {
+        const perms = await fetchPermissions()
+        setPermissions(perms.data || perms)
+      } catch (e) {
+        console.error(e)
+      }
+    })()
   }, [])
 
   const filteredRoles = roles.filter((role) =>
@@ -34,6 +46,20 @@ export const RolesPage: React.FC = () => {
       } catch (error) {
         console.error('Erro ao deletar grupo:', error)
       }
+    }
+  }
+
+  const openEditRole = (role: any) => {
+    setSelectedRole(role)
+    setIsEditRoleModalOpen(true)
+  }
+
+  const handleUpdateRole = async (id: string, name: string, perms: string[]) => {
+    try {
+      await updateRole(id, { name, permissions: perms })
+      await fetchRoles()
+    } catch (error) {
+      console.error('Erro ao atualizar grupo:', error)
     }
   }
 
@@ -75,13 +101,23 @@ export const RolesPage: React.FC = () => {
           roles={filteredRoles}
           loading={loading}
           onDelete={handleDeleteRole}
+          onEdit={openEditRole}
         />
 
         {/* Add Role Modal */}
         <AddRoleModal
           isOpen={isAddRoleModalOpen}
           onClose={() => setIsAddRoleModalOpen(false)}
+          permissions={permissions}
           onSubmit={handleAddRole}
+        />
+
+        <EditRoleModal
+          isOpen={isEditRoleModalOpen}
+          role={selectedRole}
+          permissions={permissions}
+          onClose={() => setIsEditRoleModalOpen(false)}
+          onSubmit={handleUpdateRole}
         />
       </div>
     </div>

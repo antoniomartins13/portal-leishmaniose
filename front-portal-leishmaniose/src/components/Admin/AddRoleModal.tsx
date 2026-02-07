@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
@@ -10,8 +10,6 @@ const createRoleSchema = yup.object({
     .required('Nome é obrigatório')
     .min(3, 'Mínimo 3 caracteres')
     .matches(/^[a-z_]+$/, 'Use apenas letras minúsculas e underscore'),
-  display_name: yup.string().required('Nome de exibição é obrigatório'),
-  description: yup.string(),
 })
 
 type CreateRoleFormData = yup.InferType<typeof createRoleSchema>
@@ -20,13 +18,20 @@ interface AddRoleModalProps {
   isOpen: boolean
   onClose: () => void
   onSubmit: (data: CreateRoleFormData) => Promise<void>
+  permissions: { id: number | string; name: string }[]
 }
 
-export const AddRoleModal: React.FC<AddRoleModalProps> = ({ isOpen, onClose, onSubmit }) => {
+export const AddRoleModal: React.FC<AddRoleModalProps> = ({ isOpen, permissions, onClose, onSubmit }) => {
   const methods = useForm<CreateRoleFormData>({
     resolver: yupResolver(createRoleSchema),
     mode: 'onBlur',
   })
+
+  const [selected, setSelected] = useState<string[]>([])
+
+  const toggle = (name: string) => {
+    setSelected((prev) => (prev.includes(name) ? prev.filter((p) => p !== name) : [...prev, name]))
+  }
 
   const handleFormSubmit = async (data: CreateRoleFormData) => {
     try {
@@ -49,26 +54,20 @@ export const AddRoleModal: React.FC<AddRoleModalProps> = ({ isOpen, onClose, onS
           <form onSubmit={methods.handleSubmit(handleFormSubmit)} className="space-y-4">
             <FormInput
               name="name"
-              label="Nome (slug)"
+              label="Nome"
               type="text"
               placeholder="ex: gerenciador_casos"
               required
             />
 
-            <FormInput
-              name="display_name"
-              label="Nome de Exibição"
-              type="text"
-              placeholder="ex: Gerenciador de Casos"
-              required
-            />
-
-            <FormInput
-              name="description"
-              label="Descrição"
-              type="text"
-              placeholder="Descrição do grupo..."
-            />
+            <div className="grid grid-cols-2 gap-2 max-h-64 overflow-auto">
+              {permissions.map((perm) => (
+                <label key={perm.name} className="flex items-center space-x-2">
+                  <input type="checkbox" checked={selected.includes(perm.name)} onChange={() => toggle(perm.name)} />
+                  <span className="text-sm text-gray-700">{perm.name}</span>
+                </label>
+              ))}
+            </div>
 
             <div className="flex space-x-3 pt-4">
               <button

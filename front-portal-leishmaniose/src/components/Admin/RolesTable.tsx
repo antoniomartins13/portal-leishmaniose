@@ -1,11 +1,9 @@
 import React from 'react'
-import { Trash2 } from 'lucide-react'
+import { Trash2, Edit2 } from 'lucide-react'
 
 interface Role {
   id?: string
   name: string
-  display_name?: string
-  description?: string
   permissions_count?: number
 }
 
@@ -13,9 +11,10 @@ interface RolesTableProps {
   roles: Role[]
   loading: boolean
   onDelete: (id: string) => void
+  onEdit?: (role: Role) => void
 }
 
-export const RolesTable: React.FC<RolesTableProps> = ({ roles, loading, onDelete }) => {
+export const RolesTable: React.FC<RolesTableProps> = ({ roles, loading, onDelete, onEdit }) => {
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
       {loading ? (
@@ -29,9 +28,6 @@ export const RolesTable: React.FC<RolesTableProps> = ({ roles, loading, onDelete
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   Nome
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  Descrição
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   Permissões
@@ -48,15 +44,21 @@ export const RolesTable: React.FC<RolesTableProps> = ({ roles, loading, onDelete
                     <td className="px-6 py-4 whitespace-nowrap">
                       <p className="font-medium text-gray-900">{role.name}</p>
                     </td>
-                    <td className="px-6 py-4">
-                      <p className="text-sm text-gray-600">{role.description || '-'}</p>
-                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="px-3 py-1 text-xs font-semibold bg-teal-100 text-teal-800 rounded-full">
                         {role.permissions_count || 0}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 whitespace-nowrap flex items-center space-x-3">
+                      {onEdit && (
+                        <button
+                          onClick={() => onEdit(role)}
+                          className="text-blue-600 hover:text-blue-800 transition"
+                          title="Editar"
+                        >
+                          <Edit2 size={18} />
+                        </button>
+                      )}
                       <button
                         onClick={() => onDelete(role.id || role.name)}
                         className="text-red-600 hover:text-red-800 transition"

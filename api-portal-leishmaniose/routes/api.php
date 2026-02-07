@@ -36,7 +36,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('users', UserController::class);
 
     // Role management routes (admin only)
-    Route::apiResource('roles', RoleController::class)->only(['index', 'store', 'destroy']);
+    Route::apiResource('roles', RoleController::class)->only(['index', 'store', 'destroy', 'show', 'update']);
+
+    // Permissions list for role management
+    Route::get('permissions', [\App\Http\Controllers\API\PermissionController::class, 'index']);
 
     // User info endpoint
     Route::get('/user', function (Request $request) {
