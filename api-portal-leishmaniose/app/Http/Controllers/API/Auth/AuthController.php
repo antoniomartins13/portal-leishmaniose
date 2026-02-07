@@ -54,10 +54,17 @@ class AuthController extends BaseController
         }
 
         $user = $this->authService->getUserByEmail($credentials['email']);
+        $user->load('roles', 'permissions');
+        
+        // Preparar dados do usuário com roles como array de strings
+        $userData = $user->toArray();
+        $userData['roles'] = $user->roles->pluck('name')->toArray();
+        $userData['permissions'] = $user->getAllPermissions()->pluck('name')->toArray();
+        
         $token = $this->authService->createToken($user);
 
         return $this->sendResponse([
-            'user' => $user,
+            'user' => $userData,
             'token' => $token,
         ], 'Login successful', 200);
     }
