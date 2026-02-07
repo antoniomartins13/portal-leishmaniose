@@ -33,18 +33,16 @@ class UserUpdateRequest extends FormRequest
     }
 
     /**
-     * Mensagens de validação customizadas.
+     * Retorna os nomes customizados dos atributos.
+     * (Opcional - pode ser removido se usar apenas o arquivo de tradução)
      */
-    public function messages(): array
+    public function attributes(): array
     {
         return [
-            'name.string' => 'O nome deve ser um texto',
-            'name.max' => 'O nome não pode ter mais de 255 caracteres',
-            'email.email' => 'O email deve ser válido',
-            'email.unique' => 'Este email já está registrado',
-            'password.string' => 'A senha deve ser um texto',
-            'password.min' => 'A senha deve ter no mínimo 8 caracteres',
-            'role.in' => 'O grupo fornecido é inválido',
+            'name' => 'nome',
+            'email' => 'e-mail',
+            'password' => 'senha',
+            'role' => 'grupo',
         ];
     }
 }
