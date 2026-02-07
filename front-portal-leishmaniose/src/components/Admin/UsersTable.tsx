@@ -74,8 +74,8 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, loading, onEdit, 
                       <p className="text-sm text-gray-600">{user.email}</p>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-3 py-1 text-xs font-semibold rounded-full ${getRoleColor(user.role)}`}>
-                        {getRoleLabel(user.role)}
+                      <span className={`px-3 py-1 text-xs font-semibold rounded-full ${getRoleColor(user.roles[0].name)}`}>
+                        {getRoleLabel(user.roles[0].name)}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">

@@ -46,7 +46,7 @@ export const usersApi = {
     }
 
     if (search) {
-      queryObj.search_all_fields_string = search
+      queryObj.search = search
     }
 
     if (role) {

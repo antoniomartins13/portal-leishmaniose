@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
@@ -42,12 +42,24 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
     resolver: yupResolver(editUserSchema),
     mode: 'onBlur',
     defaultValues: {
-      name: user?.name || '',
-      email: user?.email || '',
-      role: user?.role || 'pesquisador',
+      name: '',
+      email: '',
+      role: 'pesquisador',
       password: '',
     },
   })
+
+  // Atualizar os valores do formulário quando o usuário muda
+  useEffect(() => {
+    if (user && isOpen) {
+      methods.reset({
+        name: user.name || '',
+        email: user.email || '',
+        role: user.role || 'pesquisador',
+        password: '',
+      })
+    }
+  }, [user, isOpen, methods])
 
   const handleFormSubmit = async (data: EditUserFormData) => {
     try {

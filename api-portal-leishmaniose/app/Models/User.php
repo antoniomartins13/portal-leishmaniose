@@ -45,6 +45,16 @@ class User extends Authenticatable
     }
 
     /**
+     * Scope para filtrar usuários por role
+     */
+    public function scopeRole(\Illuminate\Database\Eloquent\Builder $query, string $role)
+    {
+        return $query->whereHas('roles', function ($q) use ($role) {
+            $q->where('name', $role);
+        });
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

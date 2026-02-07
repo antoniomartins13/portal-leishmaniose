@@ -3,6 +3,7 @@ import { Plus } from 'lucide-react'
 import { useUsers } from '../hooks/useUsers'
 import { UsersFilters, UsersTable, AddUserModal } from '../components/Admin'
 import { EditUserModal, type EditUserFormData } from '../components/Admin/EditUserModal'
+import { type CreateUserFormData } from '../components/Admin/AddUserModal'
 
 interface User {
   id: number
@@ -23,16 +24,18 @@ export const AdminPage: React.FC = () => {
 
   // Carregar usuários ao montar o componente
   useEffect(() => {
-    fetchUsers()
+    fetchUsers(1, undefined, undefined)
   }, [])
 
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter
-    return matchesSearch && matchesRole
-  })
+  // Chamar API quando searchTerm ou roleFilter mudam
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      const roleParam = roleFilter === 'all' ? undefined : roleFilter
+      fetchUsers(1, searchTerm || undefined, roleParam)
+    }, 300) // Debounce de 300ms
+
+    return () => clearTimeout(delayDebounceFn)
+  }, [searchTerm, roleFilter, fetchUsers])
 
   const handleAddUser = async (data: CreateUserFormData) => {
     try {
@@ -99,7 +102,7 @@ export const AdminPage: React.FC = () => {
 
         {/* Users Table */}
         <UsersTable
-          users={filteredUsers}
+          users={users}
           loading={loading}
           onEdit={openEditModal}
           onDelete={handleDeleteUser}
