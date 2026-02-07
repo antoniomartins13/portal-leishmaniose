@@ -19,7 +19,7 @@ class BaseController extends Controller
     /**
      * Valida permissão e aborta com 403 se não tiver
      */
-    protected function authorize(string $permission): void
+    public function authorizePermission(string $permission): void
     {
         PermissionHelper::authorize($permission);
     }

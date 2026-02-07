@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\API\Auth\AuthController;
+use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\RoleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -29,6 +31,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('logout-all', [AuthController::class, 'logoutAll'])->name('auth.logoutAll');
         Route::get('profile', [AuthController::class, 'profile'])->name('auth.profile');
     });
+
+    // User management routes (admin only)
+    Route::apiResource('users', UserController::class);
+
+    // Role management routes (admin only)
+    Route::apiResource('roles', RoleController::class)->only(['index', 'store', 'destroy']);
 
     // User info endpoint
     Route::get('/user', function (Request $request) {

@@ -10,7 +10,7 @@ let currentRoute = window.location.pathname
 const abortController = new AbortController()
 
 const api: AxiosInstance = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+  baseURL: import.meta.env.VITE_APP_API_URL || 'http://localhost:8000/api',
   headers: {
     'Content-Type': 'application/json'
   }
