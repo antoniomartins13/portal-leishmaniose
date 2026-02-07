@@ -50,16 +50,32 @@ class NotificationController extends BaseController
     }
 
     /**
-     * Lista todas as notificações (admin only).
+     * Lista todas as notificações (admin/gestor).
      */
     public function index(): JsonResponse
     {
         $this->authorizePermission('notifications.view');
 
         try {
-            $notifications = Notification::with('user')
-                ->orderBy('created_at', 'desc')
-                ->paginate(15);
+            $query = Notification::with(['user', 'symptoms'])
+                ->orderBy('created_at', 'desc');
+
+            // Filtro por status
+            if (request()->has('status') && request('status') !== 'all') {
+                $query->where('status', request('status'));
+            }
+
+            // Busca por protocolo, nome ou cidade
+            if (request()->has('search') && request('search')) {
+                $search = request('search');
+                $query->where(function ($q) use ($search) {
+                    $q->where('protocol', 'ilike', "%{$search}%")
+                        ->orWhere('name', 'ilike', "%{$search}%")
+                        ->orWhere('city', 'ilike', "%{$search}%");
+                });
+            }
+
+            $notifications = $query->paginate(15);
 
             return $this->sendResponse($notifications, 'Notificações listadas com sucesso');
         } catch (\Exception $e) {
@@ -75,7 +91,7 @@ class NotificationController extends BaseController
         $this->authorizePermission('notifications.view');
 
         try {
-            $notification->load('user');
+            $notification->load(['user', 'symptoms']);
             return $this->sendResponse($notification, 'Notificação recuperada com sucesso');
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage(), 500);

@@ -49,6 +49,11 @@ Route::middleware('auth:sanctum')->group(function () {
     // Permissions list for role management
     Route::get('permissions', [\App\Http\Controllers\API\PermissionController::class, 'index']);
 
+    // Notification management routes (gestor/admin)
+    Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('notifications/{notification}', [NotificationController::class, 'show'])->name('notifications.show');
+    Route::patch('notifications/{notification}/status', [NotificationController::class, 'updateStatus'])->name('notifications.updateStatus');
+
     // Symptom management routes (admin only)
     Route::get('symptoms/all', [SymptomController::class, 'adminIndex'])->name('symptoms.adminIndex');
     Route::apiResource('symptoms', SymptomController::class)->except(['index']);

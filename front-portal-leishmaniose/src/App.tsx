@@ -16,6 +16,7 @@ import { AboutPage } from './pages/AboutPage'
 import { AdminPage } from './pages/AdminPage'
 import { RolesPage } from './pages/RolesPage'
 import { SymptomsPage } from './pages/Admin/SymptomsPage'
+import { NotificationsPage } from './pages/Admin/NotificationsPage'
 import { useAuth } from './hooks/useAuth'
 import './index.css'
 
@@ -40,6 +41,11 @@ const RootApp: React.FC = () => {
             <Route path="/notificar" element={<NotificationPage />} />
             <Route path="/noticias" element={<NewsPage />} />
             <Route path="/sobre" element={<AboutPage />} />
+
+            {/* Protected Routes - Notifications (gestor/admin) */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/gerenciar-notificacoes" element={<NotificationsPage />} />
+            </Route>
 
             {/* Protected Admin Routes */}
             <Route element={<ProtectedRoute />}>

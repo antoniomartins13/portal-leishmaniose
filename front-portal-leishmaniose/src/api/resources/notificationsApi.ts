@@ -1,4 +1,5 @@
 import BaseApi from '../baseApi'
+import { api } from '../configs/axiosConfigs'
 
 export interface CreateNotificationRequest {
   name?: string
@@ -18,6 +19,17 @@ export interface NotificationResponse {
   protocol: string
 }
 
+export interface NotificationSymptom {
+  id: number
+  name: string
+}
+
+export interface NotificationUser {
+  id: number
+  name: string
+  email: string
+}
+
 export interface Notification {
   id: number
   protocol: string
@@ -29,31 +41,61 @@ export interface Notification {
   city: string
   neighborhood: string | null
   symptoms_date: string
-  symptoms?: any[] // Ajustado para receber objetos de sintomas se necessário
+  symptoms?: NotificationSymptom[]
   details: string | null
   status: 'pending' | 'in_analysis' | 'confirmed' | 'discarded'
+  status_label?: string
   user_id: number | null
+  user?: NotificationUser | null
   created_at: string
   updated_at: string
+}
+
+export interface PaginatedNotifications {
+  data: Notification[]
+  current_page: number
+  last_page: number
+  per_page: number
+  total: number
 }
 
 const baseApi = new BaseApi<Notification>('notifications')
 
 export const notificationsApi = {
+  /**
+   * Cria uma nova notificação (rota pública)
+   */
   async create(data: CreateNotificationRequest): Promise<NotificationResponse> {
     const response = await baseApi.create(data)
     return response as unknown as NotificationResponse
   },
 
-  async getAll(page = 1) {
-    return await baseApi.get(`/notifications?page=${page}`)
+  /**
+   * Lista notificações com filtros (admin/gestor)
+   */
+  async getAll(page = 1, status?: string, search?: string): Promise<PaginatedNotifications> {
+    const params = new URLSearchParams()
+    params.append('page', String(page))
+    if (status && status !== 'all') params.append('status', status)
+    if (search) params.append('search', search)
+
+    const response = await api.get(`/notifications?${params.toString()}`)
+    return response?.data?.data ?? { data: [], current_page: 1, last_page: 1, per_page: 15, total: 0 }
   },
 
-  async getById(id: number) {
-    return await baseApi.get(`/notifications/${id}`)
+  /**
+   * Busca uma notificação pelo ID (admin/gestor)
+   */
+  async getById(id: number): Promise<Notification> {
+    const response = await api.get(`/notifications/${id}`)
+    return response?.data?.data ?? null
   },
 
-  async updateStatus(id: number, status: string) {
-    return await baseApi.update(id, { status })
+  /**
+   * Atualiza o status de uma notificação (admin/gestor)
+   */
+  async updateStatus(id: number, status: string): Promise<Notification> {
+    const response = await api.patch(`/notifications/${id}/status`, { status })
+    return response?.data?.data ?? null
   },
 }

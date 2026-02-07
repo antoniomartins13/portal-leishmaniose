@@ -51,6 +51,11 @@ class PermissionsSeeder extends Seeder
             'symptoms.create',
             'symptoms.edit',
             'symptoms.delete',
+
+            // Notifications
+            'notifications.view',
+            'notifications.edit',
+            'notifications.delete',
         ];
 
         foreach ($permissions as $permission) {
@@ -75,6 +80,8 @@ class PermissionsSeeder extends Seeder
             'reports.edit',
             'users.view',
             'roles.view',
+            'notifications.view',
+            'notifications.edit',
         ]);
 
         $pesquisador = Role::firstOrCreate(
