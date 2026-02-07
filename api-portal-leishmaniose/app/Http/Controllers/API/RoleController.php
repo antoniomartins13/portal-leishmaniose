@@ -34,9 +34,18 @@ class RoleController extends BaseController
         try {
             $validated = $request->validate([
                 'name' => 'required|string|unique:roles,name',
+                'permissions' => 'array',
+                'permissions.*' => 'string',
             ]);
 
-            $role = Role::create($validated);
+            $role = Role::create(['name' => $validated['name']]);
+
+            // Sincroniza permissões se fornecidas
+            if (!empty($validated['permissions'])) {
+                $role->syncPermissions($validated['permissions']);
+            }
+
+            $role->load('permissions');
 
             return $this->sendResponse($role, 'Grupo criado com sucesso', 201);
         } catch (\Exception $e) {

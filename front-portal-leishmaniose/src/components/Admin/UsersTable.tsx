@@ -7,6 +7,7 @@ interface User {
   email: string
   role?: string
   roles?: { id: number; name: string }[]
+  deleted_at?: string | null
   created_at: string
 }
 
@@ -57,6 +58,9 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, loading, onEdit, 
                   Grupo
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                   Criado em
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
@@ -85,6 +89,17 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, loading, onEdit, 
                         </span>
                       )}
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {user.deleted_at ? (
+                        <span className="px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                          Inativo
+                        </span>
+                      ) : (
+                        <span className="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                          Ativo
+                        </span>
+                      )}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                       {new Date(user.created_at).toLocaleDateString('pt-BR')}
                     </td>
@@ -110,7 +125,7 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, loading, onEdit, 
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
                     Nenhum usuário encontrado
                   </td>
                 </tr>

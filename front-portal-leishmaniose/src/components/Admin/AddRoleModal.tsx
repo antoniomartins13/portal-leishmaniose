@@ -17,7 +17,7 @@ type CreateRoleFormData = yup.InferType<typeof createRoleSchema>
 interface AddRoleModalProps {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (data: CreateRoleFormData) => Promise<void>
+  onSubmit: (data: { name: string; permissions: string[] }) => Promise<void>
   permissions: { id: number | string; name: string }[]
 }
 
@@ -35,8 +35,9 @@ export const AddRoleModal: React.FC<AddRoleModalProps> = ({ isOpen, permissions,
 
   const handleFormSubmit = async (data: CreateRoleFormData) => {
     try {
-      await onSubmit(data)
+      await onSubmit({ name: data.name, permissions: selected })
       methods.reset()
+      setSelected([]) // Limpa as permissões selecionadas
       onClose()
     } catch (error) {
       console.error('Erro ao criar grupo:', error)
@@ -75,6 +76,7 @@ export const AddRoleModal: React.FC<AddRoleModalProps> = ({ isOpen, permissions,
                 onClick={() => {
                   onClose()
                   methods.reset()
+                  setSelected([]) // Limpa as permissões selecionadas
                 }}
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition"
               >

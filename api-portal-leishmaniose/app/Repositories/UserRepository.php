@@ -20,7 +20,7 @@ class UserRepository extends BaseRepository
         ?string $search = null,
         array $filters = []
     ) {
-        $query = $this->entity->query()->with('roles');
+        $query = $this->entity->query()->with('roles')->withTrashed();
 
         // Busca por nome ou email
         if ($search) {

@@ -14,17 +14,20 @@ export const RolesPage: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<any | undefined>()
   const [permissions, setPermissions] = useState<any[]>([])
 
-  // Carregar roles ao montar o componente
+  // Função para carregar permissões
+  const loadPermissions = async () => {
+    try {
+      const perms = await fetchPermissions()
+      setPermissions(perms.data || perms)
+    } catch (e) {
+      console.error('Erro ao carregar permissões:', e)
+    }
+  }
+
+  // Carregar roles e permissões ao montar o componente
   useEffect(() => {
     fetchRoles()
-    ;(async () => {
-      try {
-        const perms = await fetchPermissions()
-        setPermissions(perms.data || perms)
-      } catch (e) {
-        console.error(e)
-      }
-    })()
+    loadPermissions()
   }, [])
 
   const filteredRoles = roles.filter((role) =>
@@ -34,6 +37,8 @@ export const RolesPage: React.FC = () => {
   const handleAddRole = async (data: any) => {
     try {
       await createRole(data)
+      // Recarrega a lista após criar
+      await fetchRoles()
     } catch (error) {
       console.error('Erro ao criar grupo:', error)
     }
@@ -43,6 +48,8 @@ export const RolesPage: React.FC = () => {
     if (window.confirm('Tem certeza que deseja deletar este grupo?')) {
       try {
         await deleteRole(id)
+        // Recarrega a lista após deletar
+        await fetchRoles()
       } catch (error) {
         console.error('Erro ao deletar grupo:', error)
       }

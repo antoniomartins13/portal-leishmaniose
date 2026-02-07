@@ -61,9 +61,11 @@ export const AdminPage: React.FC = () => {
   }
 
   const handleDeleteUser = async (id: number) => {
-    if (window.confirm('Tem certeza que deseja deletar este usuário?')) {
+    if (window.confirm('Tem certeza que deseja desativar este usuário?')) {
       try {
         await deleteUser(id)
+        // Recarrega a lista para mostrar o usuário como inativo
+        await fetchUsers(1, searchTerm || undefined, roleFilter === 'all' ? undefined : roleFilter)
       } catch (error) {
         console.error('Erro ao deletar usuário:', error)
       }
