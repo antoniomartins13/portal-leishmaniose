@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, User, ChevronDown, LogOut, Settings } from 'lucide-react';
+import { Menu, X, User, ChevronDown, LogOut, Settings, FileText, BarChart3 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { usePermission } from '../hooks/usePermission';
 
@@ -31,6 +31,8 @@ export function Header() {
     };
 
     const canAccessAdmin = user && hasRole('admin');
+    const canManageNotifications = user && hasRole(['admin', 'gestor']);
+    const canAccessResearch = user && hasRole(['admin', 'gestor', 'pesquisador']);
 
     return (
         <header className="bg-teal-700 text-white shadow-md">
@@ -81,6 +83,26 @@ export function Header() {
                                 {/* Dropdown Menu */}
                                 {isDropdownOpen && (
                                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                                        {canManageNotifications && (
+                                            <Link
+                                                to="/gerenciar-notificacoes"
+                                                className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition-colors"
+                                                onClick={() => setIsDropdownOpen(false)}
+                                            >
+                                                <FileText size={16} />
+                                                <span>Notificações</span>
+                                            </Link>
+                                        )}
+                                        {canAccessResearch && (
+                                            <Link
+                                                to="/casos-confirmados"
+                                                className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition-colors"
+                                                onClick={() => setIsDropdownOpen(false)}
+                                            >
+                                                <BarChart3 size={16} />
+                                                <span>Casos Confirmados</span>
+                                            </Link>
+                                        )}
                                         {canAccessAdmin && (
                                             <Link
                                                 to="/admin"
@@ -170,6 +192,26 @@ export function Header() {
                                         <User size={18} />
                                         <span className="font-medium">{user.name}</span>
                                     </div>
+                                    {canManageNotifications && (
+                                        <Link
+                                            to="/gerenciar-notificacoes"
+                                            className="flex items-center space-x-2 py-2 hover:text-teal-200 transition-colors"
+                                            onClick={() => setIsMenuOpen(false)}
+                                        >
+                                            <FileText size={18} />
+                                            <span>Notificações</span>
+                                        </Link>
+                                    )}
+                                    {canAccessResearch && (
+                                        <Link
+                                            to="/casos-confirmados"
+                                            className="flex items-center space-x-2 py-2 hover:text-teal-200 transition-colors"
+                                            onClick={() => setIsMenuOpen(false)}
+                                        >
+                                            <BarChart3 size={18} />
+                                            <span>Casos Confirmados</span>
+                                        </Link>
+                                    )}
                                     {canAccessAdmin && (
                                         <Link
                                             to="/admin"

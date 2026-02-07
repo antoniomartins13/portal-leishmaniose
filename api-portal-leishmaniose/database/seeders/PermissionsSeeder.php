@@ -30,21 +30,16 @@ class PermissionsSeeder extends Seeder
             'roles.edit',
             'roles.delete',
 
-            // Cases
-            'cases.view',
-            'cases.create',
-            'cases.edit',
-            'cases.delete',
+            // Symptoms
+            'symptoms.view',
+            'symptoms.create',
+            'symptoms.edit',
+            'symptoms.delete',
 
-            // Reports
-            'reports.view',
-            'reports.create',
-            'reports.edit',
-            'reports.delete',
-
-            // Settings
-            'settings.view',
-            'settings.edit',
+            // Notifications
+            'notifications.view',
+            'notifications.edit',
+            'notifications.delete',
         ];
 
         foreach ($permissions as $permission) {
@@ -63,22 +58,17 @@ class PermissionsSeeder extends Seeder
             ['name' => 'gestor', 'guard_name' => 'sanctum']
         );
         $gestor->syncPermissions([
-            'cases.view',
-            'reports.view',
-            'reports.create',
-            'reports.edit',
             'users.view',
             'roles.view',
+            'notifications.view',
+            'notifications.edit',
         ]);
 
         $pesquisador = Role::firstOrCreate(
             ['name' => 'pesquisador', 'guard_name' => 'sanctum']
         );
         $pesquisador->syncPermissions([
-            'cases.view',
-            'cases.create',
-            'cases.edit',
-            'reports.view',
+            'notifications.view',
         ]);
 
         $this->command->info('Permissões e roles criados com sucesso!');
