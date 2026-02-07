@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\NotificationStoreRequest;
 use App\Mail\NotificationConfirmationMail;
+use App\Mail\NotificationStatusChangedMail;
 use App\Models\Notification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Mail;
@@ -131,7 +132,13 @@ class NotificationController extends BaseController
                 'status' => 'required|in:pending,in_analysis,confirmed,discarded',
             ]);
 
+            $oldStatusLabel = $notification->status_label;
             $notification->update($validated);
+            $newStatusLabel = $notification->fresh()->status_label;
+
+            // Envia e-mail de alerta sobre alteração de status
+            Mail::to($notification->email)
+                ->send(new NotificationStatusChangedMail($notification, $oldStatusLabel, $newStatusLabel));
 
             return $this->sendResponse($notification, 'Status atualizado com sucesso');
         } catch (\Exception $e) {
