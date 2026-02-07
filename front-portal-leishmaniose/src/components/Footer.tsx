@@ -60,13 +60,13 @@ export function Footer() {
                         <p className="text-teal-100 text-sm">
                             contato@portalleishmaniose.gov.br
                             <br />
-                            Tel: (61) 3333-4444
+                            Tel: 0800-XXX-XXXX
                         </p>
                     </div>
                 </div>
 
                 <div className="border-t border-teal-700 mt-8 pt-6 text-center text-sm text-teal-200">
-                    <p>© 2023 Portal da Leishmaniose. Todos os direitos reservados.</p>
+                    <p>© 2026 Portal da Leishmaniose. Todos os direitos reservados.</p>
                 </div>
             </div>
         </footer>
