@@ -9,9 +9,12 @@ const editUserSchema = yup.object({
   email: yup.string().email('Email inválido').required('Email é obrigatório'),
   password: yup
     .string()
-    .min(8, 'Senha deve ter no mínimo 8 caracteres')
-    .optional()
-    .nullable(),
+    .transform((value) => value || undefined) // Transforma string vazia em undefined
+    .notRequired()
+    .test('min-length', 'Senha deve ter no mínimo 8 caracteres', (value) => {
+      if (!value || value.length === 0) return true; // Vazio é válido
+      return value.length >= 8;
+    }),
   role: yup.string().required('Grupo é obrigatório'),
 })
 
@@ -21,7 +24,8 @@ interface User {
   id: number
   name: string
   email: string
-  role: string
+  role?: string
+  roles?: { id: number; name: string }[]
   created_at: string
 }
 
@@ -52,10 +56,12 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
   // Atualizar os valores do formulário quando o usuário muda
   useEffect(() => {
     if (user && isOpen) {
+      // Pegar role do array roles[0].name ou da string role
+      const userRole = user.roles?.[0]?.name || '';
       methods.reset({
         name: user.name || '',
         email: user.email || '',
-        role: user.role || 'pesquisador',
+        role: userRole,
         password: '',
       })
     }
@@ -99,6 +105,7 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
               label="Senha (deixe vazio para manter a atual)"
               type="password"
               placeholder="Nova senha (opcional)"
+              required={false}
             />
 
             <FormSelect

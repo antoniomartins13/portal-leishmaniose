@@ -5,7 +5,8 @@ interface User {
   id: number
   name: string
   email: string
-  role: string
+  role?: string
+  roles?: { id: number; name: string }[]
   created_at: string
 }
 
@@ -74,9 +75,15 @@ export const UsersTable: React.FC<UsersTableProps> = ({ users, loading, onEdit, 
                       <p className="text-sm text-gray-600">{user.email}</p>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-3 py-1 text-xs font-semibold rounded-full ${getRoleColor(user.roles[0].name)}`}>
-                        {getRoleLabel(user.roles[0].name)}
-                      </span>
+                      {user.roles && user.roles.length > 0 ? (
+                        <span className={`px-3 py-1 text-xs font-semibold rounded-full ${getRoleColor(user.roles[0].name)}`}>
+                          {getRoleLabel(user.roles[0].name)}
+                        </span>
+                      ) : (
+                        <span className="px-3 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                          Sem grupo
+                        </span>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                       {new Date(user.created_at).toLocaleDateString('pt-BR')}
