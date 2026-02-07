@@ -15,6 +15,7 @@ import { NewsPage } from './pages/NewsPage'
 import { AboutPage } from './pages/AboutPage'
 import { AdminPage } from './pages/AdminPage'
 import { RolesPage } from './pages/RolesPage'
+import { SymptomsPage } from './pages/Admin/SymptomsPage'
 import { useAuth } from './hooks/useAuth'
 import './index.css'
 
@@ -46,6 +47,7 @@ const RootApp: React.FC = () => {
                 <Route index element={<RolesPage />} />
                 <Route path="usuarios" element={<AdminPage />} />
                 <Route path="grupos" element={<RolesPage />} />
+                <Route path="sintomas" element={<SymptomsPage />} />
               </Route>
             </Route>
 

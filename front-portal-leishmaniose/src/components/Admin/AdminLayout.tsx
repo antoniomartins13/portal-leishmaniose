@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { Users, Shield, ChevronLeft } from 'lucide-react';
+import { Users, Shield, ChevronLeft, BadgeAlert } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface MenuItem {
@@ -18,6 +18,11 @@ const menuItems: MenuItem[] = [
         path: '/admin/grupos',
         label: 'Grupos',
         icon: <Shield size={20} />,
+    },
+    {
+        path: '/admin/sintomas',
+        label: 'Sintomas',
+        icon: <BadgeAlert size={20} />,
     },
 ];
 
@@ -47,8 +52,8 @@ export const AdminLayout: React.FC = () => {
                                         const shouldBeActive = isActive ||
                                             (isGruposItem && window.location.pathname === '/admin');
                                         return `flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${shouldBeActive
-                                                ? 'bg-teal-600 text-white'
-                                                : 'text-teal-100 hover:bg-teal-700'
+                                            ? 'bg-teal-600 text-white'
+                                            : 'text-teal-100 hover:bg-teal-700'
                                             }`;
                                     }}
                                 >

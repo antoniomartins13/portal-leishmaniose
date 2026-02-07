@@ -45,6 +45,12 @@ class PermissionsSeeder extends Seeder
             // Settings
             'settings.view',
             'settings.edit',
+
+            // Symptoms
+            'symptoms.view',
+            'symptoms.create',
+            'symptoms.edit',
+            'symptoms.delete',
         ];
 
         foreach ($permissions as $permission) {
