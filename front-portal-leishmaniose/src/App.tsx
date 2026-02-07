@@ -1,4 +1,3 @@
-import React from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { AuthProvider } from './contexts/AuthContext'
@@ -7,6 +6,7 @@ import { ErrorBoundary } from './components/common/ErrorBoundary'
 import { ProtectedRoute, Loading } from './components/common/ProtectedRoute'
 import { Header } from './components/Header'
 import { Footer } from './components/Footer'
+import { AdminLayout } from './components/Admin/AdminLayout'
 import { LoginPage } from './pages/LoginPage'
 import { HomePage } from './pages/HomePage'
 import { DashboardPage } from './pages/DashboardPage'
@@ -33,7 +33,6 @@ const RootApp: React.FC = () => {
         <main className="flex-grow">
           <Routes>
             {/* Public Routes */}
-            <Route path="*" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/" element={<HomePage />} />
             <Route path="/painel" element={<DashboardPage />} />
@@ -41,11 +40,17 @@ const RootApp: React.FC = () => {
             <Route path="/noticias" element={<NewsPage />} />
             <Route path="/sobre" element={<AboutPage />} />
 
-            {/* Protected Routes */}
+            {/* Protected Admin Routes */}
             <Route element={<ProtectedRoute />}>
-              <Route path="/admin/usuarios" element={<AdminPage />} />
-              <Route path="/admin/grupos" element={<RolesPage />} />
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<RolesPage />} />
+                <Route path="usuarios" element={<AdminPage />} />
+                <Route path="grupos" element={<RolesPage />} />
+              </Route>
             </Route>
+
+            {/* Catch-all */}
+            <Route path="*" element={<HomePage />} />
           </Routes>
         </main>
         <Footer />

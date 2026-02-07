@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Menu, X, User, ChevronDown, LogOut, Settings } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
@@ -83,7 +83,7 @@ export function Header() {
                                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
                                         {canAccessAdmin && (
                                             <Link
-                                                to="/admin/grupos"
+                                                to="/admin"
                                                 className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition-colors"
                                                 onClick={() => setIsDropdownOpen(false)}
                                             >
@@ -172,7 +172,7 @@ export function Header() {
                                     </div>
                                     {canAccessAdmin && (
                                         <Link
-                                            to="/admin/grupos"
+                                            to="/admin"
                                             className="flex items-center space-x-2 py-2 hover:text-teal-200 transition-colors"
                                             onClick={() => setIsMenuOpen(false)}
                                         >
