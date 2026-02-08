@@ -32,13 +32,21 @@ class Notification extends Model
     ];
 
     /**
-     * Gera um protocolo único para a notificação
+     * Gera um protocolo único para a notificação.
+     * Busca o maior número sequencial já utilizado no ano (incluindo soft-deleted)
+     * para evitar colisões com registros cujo created_at difere do ano do protocolo.
      */
     public static function generateProtocol(): string
     {
         $year = date('Y');
-        $count = self::whereYear('created_at', $year)->count() + 1;
-        return sprintf('LEI-%s-%05d', $year, $count);
+        $prefix = "LEI-{$year}-";
+
+        $maxNumber = (int) self::withTrashed()
+            ->where('protocol', 'like', "{$prefix}%")
+            ->selectRaw("MAX(CAST(REPLACE(protocol, ?, '') AS INTEGER)) as max_num", [$prefix])
+            ->value('max_num');
+
+        return sprintf('LEI-%s-%05d', $year, $maxNumber + 1);
     }
 
     /**
@@ -63,7 +71,7 @@ class Notification extends Model
      */
     public function getStatusLabelAttribute(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'pending' => 'Pendente',
             'in_analysis' => 'Em Análise',
             'confirmed' => 'Confirmado',

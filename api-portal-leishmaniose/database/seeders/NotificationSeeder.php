@@ -129,7 +129,7 @@ class NotificationSeeder extends Seeder
             $createdAt = fake()->dateTimeBetween($symptomsDate, 'now');
 
             $notification = Notification::create([
-                'protocol' => sprintf('LEI-%s-%05d', date('Y'), $i),
+                'protocol' => Notification::generateProtocol(),
                 'name' => $names[array_rand($names)],
                 'cpf' => $this->generateCpf(),
                 'email' => "paciente{$i}@exemplo.com",
