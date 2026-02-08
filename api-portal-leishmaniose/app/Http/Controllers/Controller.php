@@ -8,16 +8,22 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
+use OpenApi\Annotations as OA;
 
 /**
  * @OA\Info(
  *     version="1.0.0",
- *     title="Laravel OpenApi Documentação",
- *     description="Documentação do ERP Jucese",
+ *     title="Portal Leishmaniose API",
+ *     description="Documentacao da API do Portal Leishmaniose",
  *
  *     @OA\Contact(
  *         email=""
  *     )
+ * )
+ *
+ * @OA\Server(
+ *     url="/",
+ *     description="Servidor padrao"
  * )
  *
  * @OA\SecurityScheme(
@@ -26,8 +32,8 @@ use Illuminate\Routing\Controller as BaseController;
  *     name="bearerAuth",
  *     type="http",
  *     scheme="bearer",
- *     bearerFormat="JWT",
- * ),
+ *     bearerFormat="JWT"
+ * )
  */
 class Controller extends BaseController
 {

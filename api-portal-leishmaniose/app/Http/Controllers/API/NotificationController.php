@@ -10,12 +10,39 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Mail;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Tag(
+ *   name="Notificacoes",
+ *   description="Casos de leishmaniose"
+ * )
+ */
 class NotificationController extends BaseController
 {
     /**
      * Cria uma nova notificação de caso.
      * Esta rota é pública - não precisa de autenticação.
+        *
+        * @OA\Post(
+        *   path="/api/notifications",
+        *   tags={"Notificacoes"},
+        *   summary="Registrar notificacao",
+        *   @OA\RequestBody(
+        *     required=true,
+        *     @OA\JsonContent(ref="#/components/schemas/NotificationCreateRequest")
+        *   ),
+        *   @OA\Response(
+        *     response=201,
+        *     description="Notificacao criada",
+        *     @OA\JsonContent(ref="#/components/schemas/NotificationCreatedResponse")
+        *   ),
+        *   @OA\Response(
+        *     response=500,
+        *     description="Erro ao registrar",
+        *     @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+        *   )
+        * )
      */
     public function store(NotificationStoreRequest $request): JsonResponse
     {
@@ -54,6 +81,34 @@ class NotificationController extends BaseController
 
     /**
      * Lista todas as notificações (admin/gestor).
+        *
+        * @OA\Get(
+        *   path="/api/notifications",
+        *   tags={"Notificacoes"},
+        *   summary="Listar notificacoes",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\Parameter(name="status", in="query", required=false, @OA\Schema(type="string")),
+        *   @OA\Parameter(name="search", in="query", required=false, @OA\Schema(type="string")),
+        *   @OA\Parameter(name="city", in="query", required=false, @OA\Schema(type="string")),
+        *   @OA\Parameter(name="state", in="query", required=false, @OA\Schema(type="string")),
+        *   @OA\Parameter(name="neighborhood", in="query", required=false, @OA\Schema(type="string")),
+        *   @OA\Parameter(name="symptom_id", in="query", required=false, @OA\Schema(type="integer")),
+        *   @OA\Parameter(name="symptoms_date_from", in="query", required=false, @OA\Schema(type="string", format="date")),
+        *   @OA\Parameter(name="symptoms_date_to", in="query", required=false, @OA\Schema(type="string", format="date")),
+        *   @OA\Parameter(name="created_from", in="query", required=false, @OA\Schema(type="string", format="date")),
+        *   @OA\Parameter(name="created_to", in="query", required=false, @OA\Schema(type="string", format="date")),
+        *   @OA\Parameter(name="page", in="query", required=false, @OA\Schema(type="integer", example=1)),
+        *   @OA\Response(
+        *     response=200,
+        *     description="Lista de notificacoes",
+        *     @OA\JsonContent(ref="#/components/schemas/NotificationListResponse")
+        *   ),
+        *   @OA\Response(
+        *     response=401,
+        *     description="Nao autenticado",
+        *     @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+        *   )
+        * )
      */
     public function index(): JsonResponse
     {
@@ -126,6 +181,29 @@ class NotificationController extends BaseController
 
     /**
      * Exibe uma notificação específica.
+        *
+        * @OA\Get(
+        *   path="/api/notifications/{notification}",
+        *   tags={"Notificacoes"},
+        *   summary="Detalhar notificacao",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\Parameter(
+        *     name="notification",
+        *     in="path",
+        *     required=true,
+        *     @OA\Schema(type="integer")
+        *   ),
+        *   @OA\Response(
+        *     response=200,
+        *     description="Notificacao recuperada",
+        *     @OA\JsonContent(ref="#/components/schemas/Notification")
+        *   ),
+        *   @OA\Response(
+        *     response=401,
+        *     description="Nao autenticado",
+        *     @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+        *   )
+        * )
      */
     public function show(Notification $notification): JsonResponse
     {
@@ -141,6 +219,33 @@ class NotificationController extends BaseController
 
     /**
      * Atualiza o status de uma notificação.
+        *
+        * @OA\Patch(
+        *   path="/api/notifications/{notification}/status",
+        *   tags={"Notificacoes"},
+        *   summary="Atualizar status",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\Parameter(
+        *     name="notification",
+        *     in="path",
+        *     required=true,
+        *     @OA\Schema(type="integer")
+        *   ),
+        *   @OA\RequestBody(
+        *     required=true,
+        *     @OA\JsonContent(ref="#/components/schemas/NotificationStatusUpdateRequest")
+        *   ),
+        *   @OA\Response(
+        *     response=200,
+        *     description="Status atualizado",
+        *     @OA\JsonContent(ref="#/components/schemas/Notification")
+        *   ),
+        *   @OA\Response(
+        *     response=422,
+        *     description="Falha de validacao",
+        *     @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+        *   )
+        * )
      */
     public function updateStatus(Notification $notification): JsonResponse
     {
@@ -167,6 +272,32 @@ class NotificationController extends BaseController
 
     /**
      * Exporta casos confirmados em CSV com filtros.
+        *
+        * @OA\Get(
+        *   path="/api/notifications/export-csv",
+        *   tags={"Notificacoes"},
+        *   summary="Exportar casos confirmados (CSV)",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\Parameter(name="state", in="query", required=false, @OA\Schema(type="string")),
+        *   @OA\Parameter(name="city", in="query", required=false, @OA\Schema(type="string")),
+        *   @OA\Parameter(name="neighborhood", in="query", required=false, @OA\Schema(type="string")),
+        *   @OA\Parameter(name="symptoms_date_from", in="query", required=false, @OA\Schema(type="string", format="date")),
+        *   @OA\Parameter(name="symptoms_date_to", in="query", required=false, @OA\Schema(type="string", format="date")),
+        *   @OA\Parameter(name="created_from", in="query", required=false, @OA\Schema(type="string", format="date")),
+        *   @OA\Parameter(name="created_to", in="query", required=false, @OA\Schema(type="string", format="date")),
+        *   @OA\Parameter(name="symptom_id", in="query", required=false, @OA\Schema(type="integer")),
+        *   @OA\Parameter(name="search", in="query", required=false, @OA\Schema(type="string")),
+        *   @OA\Response(
+        *     response=200,
+        *     description="Arquivo CSV",
+        *     content={@OA\MediaType(mediaType="text/csv")}
+        *   ),
+        *   @OA\Response(
+        *     response=401,
+        *     description="Nao autenticado",
+        *     @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+        *   )
+        * )
      */
     public function exportCsv(): StreamedResponse
     {
@@ -277,6 +408,32 @@ class NotificationController extends BaseController
 
     /**
      * Exporta casos confirmados em PDF com filtros.
+        *
+        * @OA\Get(
+        *   path="/api/notifications/export-pdf",
+        *   tags={"Notificacoes"},
+        *   summary="Exportar casos confirmados (PDF)",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\Parameter(name="state", in="query", required=false, @OA\Schema(type="string")),
+        *   @OA\Parameter(name="city", in="query", required=false, @OA\Schema(type="string")),
+        *   @OA\Parameter(name="neighborhood", in="query", required=false, @OA\Schema(type="string")),
+        *   @OA\Parameter(name="symptoms_date_from", in="query", required=false, @OA\Schema(type="string", format="date")),
+        *   @OA\Parameter(name="symptoms_date_to", in="query", required=false, @OA\Schema(type="string", format="date")),
+        *   @OA\Parameter(name="created_from", in="query", required=false, @OA\Schema(type="string", format="date")),
+        *   @OA\Parameter(name="created_to", in="query", required=false, @OA\Schema(type="string", format="date")),
+        *   @OA\Parameter(name="symptom_id", in="query", required=false, @OA\Schema(type="integer")),
+        *   @OA\Parameter(name="search", in="query", required=false, @OA\Schema(type="string")),
+        *   @OA\Response(
+        *     response=200,
+        *     description="Arquivo PDF",
+        *     content={@OA\MediaType(mediaType="application/pdf")}
+        *   ),
+        *   @OA\Response(
+        *     response=401,
+        *     description="Nao autenticado",
+        *     @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+        *   )
+        * )
      */
     public function exportPdf()
     {

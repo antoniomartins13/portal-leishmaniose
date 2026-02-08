@@ -5,12 +5,35 @@ namespace App\Http\Controllers\API;
 use App\Models\Symptom;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Tag(
+ *   name="Sintomas",
+ *   description="Sintomas relacionados a notificacoes"
+ * )
+ */
 class SymptomController extends BaseController
 {
     /**
      * Lista todos os sintomas ativos.
      * Esta rota é pública - não precisa de autenticação.
+        *
+        * @OA\Get(
+        *   path="/api/symptoms",
+        *   tags={"Sintomas"},
+        *   summary="Listar sintomas ativos",
+        *   @OA\Response(
+        *     response=200,
+        *     description="Lista de sintomas",
+        *     @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Symptom"))
+        *   ),
+        *   @OA\Response(
+        *     response=500,
+        *     description="Erro ao listar",
+        *     @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+        *   )
+        * )
      */
     public function index(): JsonResponse
     {
@@ -28,6 +51,23 @@ class SymptomController extends BaseController
     /**
      * Lista todos os sintomas (ativos e inativos) para o painel admin.
      * Requer autenticação e permissão symptoms.view.
+        *
+        * @OA\Get(
+        *   path="/api/symptoms/all",
+        *   tags={"Sintomas"},
+        *   summary="Listar sintomas (admin)",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\Response(
+        *     response=200,
+        *     description="Lista de sintomas",
+        *     @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Symptom"))
+        *   ),
+        *   @OA\Response(
+        *     response=401,
+        *     description="Nao autenticado",
+        *     @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+        *   )
+        * )
      */
     public function adminIndex(): JsonResponse
     {
@@ -44,6 +84,33 @@ class SymptomController extends BaseController
 
     /**
      * Cria um novo sintoma (admin only).
+        *
+        * @OA\Post(
+        *   path="/api/symptoms",
+        *   tags={"Sintomas"},
+        *   summary="Criar sintoma",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\RequestBody(
+        *     required=true,
+        *     @OA\JsonContent(
+        *       type="object",
+        *       required={"name"},
+        *       @OA\Property(property="name", type="string", example="Febre"),
+        *       @OA\Property(property="description", type="string", nullable=true, example="Sintoma comum"),
+        *       @OA\Property(property="active", type="boolean", example=true)
+        *     )
+        *   ),
+        *   @OA\Response(
+        *     response=201,
+        *     description="Sintoma criado",
+        *     @OA\JsonContent(ref="#/components/schemas/Symptom")
+        *   ),
+        *   @OA\Response(
+        *     response=422,
+        *     description="Falha de validacao",
+        *     @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+        *   )
+        * )
      */
     public function store(): JsonResponse
     {
@@ -68,6 +135,38 @@ class SymptomController extends BaseController
 
     /**
      * Atualiza um sintoma (admin only).
+        *
+        * @OA\Patch(
+        *   path="/api/symptoms/{symptom}",
+        *   tags={"Sintomas"},
+        *   summary="Atualizar sintoma",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\Parameter(
+        *     name="symptom",
+        *     in="path",
+        *     required=true,
+        *     @OA\Schema(type="integer")
+        *   ),
+        *   @OA\RequestBody(
+        *     required=true,
+        *     @OA\JsonContent(
+        *       type="object",
+        *       @OA\Property(property="name", type="string", example="Febre persistente"),
+        *       @OA\Property(property="description", type="string", nullable=true, example="Sintoma frequente"),
+        *       @OA\Property(property="active", type="boolean", example=true)
+        *     )
+        *   ),
+        *   @OA\Response(
+        *     response=200,
+        *     description="Sintoma atualizado",
+        *     @OA\JsonContent(ref="#/components/schemas/Symptom")
+        *   ),
+        *   @OA\Response(
+        *     response=422,
+        *     description="Falha de validacao",
+        *     @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+        *   )
+        * )
      */
     public function update(Symptom $symptom): JsonResponse
     {
@@ -94,6 +193,29 @@ class SymptomController extends BaseController
 
     /**
      * Remove um sintoma (admin only).
+        *
+        * @OA\Delete(
+        *   path="/api/symptoms/{symptom}",
+        *   tags={"Sintomas"},
+        *   summary="Remover sintoma",
+        *   security={{"bearerAuth":{}}},
+        *   @OA\Parameter(
+        *     name="symptom",
+        *     in="path",
+        *     required=true,
+        *     @OA\Schema(type="integer")
+        *   ),
+        *   @OA\Response(
+        *     response=200,
+        *     description="Sintoma removido",
+        *     @OA\JsonContent(type="object")
+        *   ),
+        *   @OA\Response(
+        *     response=500,
+        *     description="Falha ao remover",
+        *     @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+        *   )
+        * )
      */
     public function destroy(Symptom $symptom): JsonResponse
     {
