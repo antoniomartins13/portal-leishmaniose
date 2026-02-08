@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Http\Requests\NotificationPeriodRequest;
 use App\Http\Requests\NotificationStoreRequest;
 use App\Mail\NotificationConfirmationMail;
 use App\Mail\NotificationStatusChangedMail;
@@ -174,6 +175,55 @@ class NotificationController extends BaseController
             $notifications = $query->paginate(15);
 
             return $this->sendResponse($notifications, 'Notificações listadas com sucesso');
+        } catch (\Exception $e) {
+            return $this->sendError($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Lista notificacoes filtradas por intervalo de data (created_at).
+     *
+     * @OA\Get(
+     *   path="/api/reports/notifications",
+     *   tags={"Notificacoes"},
+     *   summary="Listar notificacoes por periodo",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Parameter(name="created_from", in="query", required=false, @OA\Schema(type="string", format="date")),
+     *   @OA\Parameter(name="created_to", in="query", required=false, @OA\Schema(type="string", format="date")),
+     *   @OA\Parameter(name="page", in="query", required=false, @OA\Schema(type="integer", example=1)),
+     *   @OA\Response(
+     *     response=200,
+     *     description="Lista de notificacoes",
+     *     @OA\JsonContent(ref="#/components/schemas/NotificationListResponse")
+     *   ),
+     *   @OA\Response(
+     *     response=401,
+     *     description="Nao autenticado",
+     *     @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *   )
+     * )
+     */
+    public function indexByPeriod(NotificationPeriodRequest $request): JsonResponse
+    {
+        $this->authorizePermission('notifications.view');
+
+        try {
+            $filters = $request->validated();
+
+            $query = Notification::with(['user', 'symptoms'])
+                ->orderBy('created_at', 'desc');
+
+            if (!empty($filters['created_from'])) {
+                $query->whereDate('created_at', '>=', $filters['created_from']);
+            }
+
+            if (!empty($filters['created_to'])) {
+                $query->whereDate('created_at', '<=', $filters['created_to']);
+            }
+
+            $notifications = $query->paginate(15);
+
+            return response()->json($notifications, 200, [], JSON_PRETTY_PRINT);
         } catch (\Exception $e) {
             return $this->sendError($e->getMessage(), 500);
         }
