@@ -1,6 +1,8 @@
 import React, { useState, useMemo } from 'react'
 import Chart from 'react-apexcharts'
 import type { ApexOptions } from 'apexcharts'
+import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet'
+import 'leaflet/dist/leaflet.css'
 import {
     TrendingUp,
     AlertCircle,
@@ -17,6 +19,17 @@ import { useAuth } from '../hooks/useAuth'
 import type { ReportFilters } from '../api/resources/reportsApi'
 
 /* ───────────── helpers ───────────── */
+
+/** Coordenadas aproximadas das capitais dos estados brasileiros */
+const STATE_COORDS: Record<string, [number, number]> = {
+    AC: [-9.97, -67.81], AL: [-9.67, -35.74], AP: [0.03, -51.06], AM: [-3.12, -60.02],
+    BA: [-12.97, -38.51], CE: [-3.72, -38.54], DF: [-15.78, -47.93], ES: [-20.32, -40.34],
+    GO: [-16.68, -49.25], MA: [-2.53, -44.28], MT: [-15.6, -56.1], MS: [-20.44, -54.65],
+    MG: [-19.92, -43.94], PA: [-1.46, -48.5], PB: [-7.12, -34.86], PR: [-25.43, -49.27],
+    PE: [-8.05, -34.87], PI: [-5.09, -42.8], RJ: [-22.91, -43.17], RN: [-5.79, -35.21],
+    RS: [-30.03, -51.23], RO: [-8.76, -63.9], RR: [2.82, -60.67], SC: [-27.59, -48.55],
+    SP: [-23.55, -46.63], SE: [-10.91, -37.07], TO: [-10.18, -48.33],
+}
 
 function formatDate(dateStr: string): string {
     const [y, m, d] = dateStr.split('-')
@@ -310,7 +323,53 @@ export const DashboardPage: React.FC = () => {
                             />
                         </div>
 
-                        {/* Row 1: Timeline + Donut */}
+                        {/* Mapa de notificações por estado */}
+                        {data.stateRanking.length > 0 && (
+                            <ChartCard title="Distribuição Geográfica por Estado">
+                                <div className="rounded-lg overflow-hidden" style={{ height: 480 }}>
+                                    <MapContainer
+                                        center={[-14.24, -51.93]}
+                                        zoom={4}
+                                        scrollWheelZoom={true}
+                                        style={{ height: '100%', width: '100%' }}
+                                    >
+                                        <TileLayer
+                                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                        />
+                                        {data.stateRanking.map((s) => {
+                                            const coords = STATE_COORDS[s.state]
+                                            if (!coords) return null
+                                            const maxCount = data.stateRanking[0]?.count ?? 1
+                                            const radius = Math.max(10, (s.count / maxCount) * 35)
+                                            const pct = data.total > 0 ? ((s.count / data.total) * 100).toFixed(1) : '0'
+                                            return (
+                                                <CircleMarker
+                                                    key={s.state}
+                                                    center={coords}
+                                                    radius={radius}
+                                                    pathOptions={{
+                                                        fillColor: '#0d9488',
+                                                        color: '#115e59',
+                                                        weight: 1.5,
+                                                        fillOpacity: 0.7,
+                                                    }}
+                                                >
+                                                    <Tooltip direction="top" offset={[0, -8]} opacity={0.95}>
+                                                        <div className="text-sm">
+                                                            <strong>{s.state}</strong><br />
+                                                            {s.count.toLocaleString('pt-BR')} notificações ({pct}%)
+                                                        </div>
+                                                    </Tooltip>
+                                                </CircleMarker>
+                                            )
+                                        })}
+                                    </MapContainer>
+                                </div>
+                            </ChartCard>
+                        )}
+
+                        {/* Timeline + Donut */}
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
                             <ChartCard title="Notificações por Dia" className="lg:col-span-2">
                                 {data.dailyCounts.length > 0 ? (
@@ -367,38 +426,6 @@ export const DashboardPage: React.FC = () => {
                                 )}
                             </ChartCard>
                         </div>
-
-                        {/* Tabela resumo por estado */}
-                        {data.stateRanking.length > 0 && (
-                            <ChartCard title="Detalhamento por Estado">
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-sm">
-                                        <thead>
-                                            <tr className="border-b border-gray-200">
-                                                <th className="text-left py-2 font-semibold text-gray-700">#</th>
-                                                <th className="text-left py-2 font-semibold text-gray-700">Estado</th>
-                                                <th className="text-right py-2 font-semibold text-gray-700">Notificações</th>
-                                                <th className="text-right py-2 font-semibold text-gray-700">% do Total</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-gray-100">
-                                            {data.stateRanking.map((s, i) => (
-                                                <tr key={s.state} className="hover:bg-gray-50">
-                                                    <td className="py-2 text-gray-500">{i + 1}</td>
-                                                    <td className="py-2 font-medium text-gray-900">{s.state}</td>
-                                                    <td className="py-2 text-right text-gray-700">
-                                                        {s.count.toLocaleString('pt-BR')}
-                                                    </td>
-                                                    <td className="py-2 text-right text-gray-500">
-                                                        {data.total > 0 ? ((s.count / data.total) * 100).toFixed(1) : 0}%
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </ChartCard>
-                        )}
                     </>
                 )}
             </div>
