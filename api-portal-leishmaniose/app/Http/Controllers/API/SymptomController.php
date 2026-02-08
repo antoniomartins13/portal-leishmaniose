@@ -49,6 +49,38 @@ class SymptomController extends BaseController
     }
 
     /**
+     * Lista sintomas para relatorios (rota publica).
+     *
+     * @OA\Get(
+     *   path="/api/reports/symptoms",
+     *   tags={"Sintomas"},
+     *   summary="Listar sintomas (relatorio)",
+     *   @OA\Response(
+     *     response=200,
+     *     description="Lista de sintomas",
+     *     @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Symptom"))
+     *   ),
+     *   @OA\Response(
+     *     response=500,
+     *     description="Erro ao listar",
+     *     @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *   )
+     * )
+     */
+    public function reportIndex(): JsonResponse
+    {
+        try {
+            $symptoms = Symptom::active()
+                ->orderBy('name')
+                ->get(['id', 'name', 'slug', 'description']);
+
+            return response()->json($symptoms, 200, [], JSON_PRETTY_PRINT);
+        } catch (\Exception $e) {
+            return $this->sendError('Erro ao listar sintomas: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
      * Lista todos os sintomas (ativos e inativos) para o painel admin.
      * Requer autenticação e permissão symptoms.view.
         *

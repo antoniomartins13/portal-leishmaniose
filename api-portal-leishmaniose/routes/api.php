@@ -30,6 +30,7 @@ Route::post('notifications', [NotificationController::class, 'store'])->name('no
 
 // Public symptoms list (for notification form)
 Route::get('symptoms', [SymptomController::class, 'index'])->name('symptoms.index');
+Route::get('reports/symptoms', [SymptomController::class, 'reportIndex'])->name('reports.symptoms');
 
 // Protected routes (require authentication)
 Route::middleware('auth:sanctum')->group(function () {
@@ -51,6 +52,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Notification management routes (gestor/admin)
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('reports/notifications', [NotificationController::class, 'indexByPeriod'])->name('reports.notifications');
     Route::get('notifications/export-csv', [NotificationController::class, 'exportCsv'])->name('notifications.exportCsv');
     Route::get('notifications/export-pdf', [NotificationController::class, 'exportPdf'])->name('notifications.exportPdf');
     Route::get('notifications/{notification}', [NotificationController::class, 'show'])->name('notifications.show');
